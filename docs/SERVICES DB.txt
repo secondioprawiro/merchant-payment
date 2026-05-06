@@ -1,0 +1,54 @@
+AUTH SERVICE DB
+
+Table-Account
+account_id uuid pk
+email string unique
+password string(hash)
+role ENUM('user', 'admin') DEFAULT 'user'
+created_at timestamp
+___________________________________________
+
+USER & WALLET SERVICE DB
+
+Table-profiles
+user_id uuid pk
+full_name string
+phone_number string
+
+Table-wallets
+user_id uuid pk
+balance bigint
+
+Table-wallet_mutations
+id uuid pk
+user_id uuid
+amount bigint
+type Enum
+desc string
+___________________________________________
+
+PRODUCTION SERVICE DB
+
+Table-categories
+id int pk
+name string
+type Enum
+
+Table-products
+id int pk
+category_id int fk
+name string
+price bigint
+is_active bool
+__________________________________________
+
+Transaction Service DB
+
+id uuid/bigint pk
+user_id uuid/bigint
+product_id int
+target_number string
+price bigint
+status Enum 'pending', 'processing', 'success', 'failed'
+sn (Serial) String Nullable. Serial Number / Token PLN (diisi jika sukses)
+created_at Timestamp
