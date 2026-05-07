@@ -15,13 +15,9 @@ public class GatewayConfig {
                         .path("/auth/**")
                         .uri("lb://auth-service")
                 )
-                .route("user-wallet-service", r -> r
-                        .path("/users/**", "/wallets/**")
-                        .uri("lb://user-wallet-service")
-                )
-                .route("transaction-service", r -> r
-                        .path("/transactions/**", "/admin/**")
-                        .uri("lb://transaction-service")
+                .route("merchant-service", r -> r
+                        .path("/merchants/**", "/merchant/**", "/products/**")
+                        .uri("lb://merchant-service")
                 )
                 .build();
     }

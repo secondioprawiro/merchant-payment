@@ -55,12 +55,12 @@ public class JwtAuthenticationFilter implements WebFilter {
         }
 
         String email = jwtUtil.extractEmail(token);
-        Long userId = jwtUtil.extractUserId(token);
+        String userId = jwtUtil.extractUserId(token);
         String role = jwtUtil.extractRole(token);
 
         ServerHttpRequest mutatedRequest = request.mutate()
-                .header("X-User-Email", email)
-                .header("X-User-Id", String.valueOf(userId))
+                .header("X-User-Email", email != null ? email : "")
+                .header("X-User-Id", userId != null ? userId : "")
                 .header("X-User-Role", role != null ? role : "")
                 .build();
 

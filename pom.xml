@@ -18,9 +18,7 @@
     <modules>
         <module>auth-service</module>
         <module>gateway-service</module>
-        <module>user-wallet-service</module>
-        <module>transaction-service</module>
-        <module>production-service</module>
+        <module>merchant-service</module>
         <module>registry-service</module>
     </modules>
 
