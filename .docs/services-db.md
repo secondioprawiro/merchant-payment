@@ -23,7 +23,8 @@
 | Column | Type | Constraints |
 |--------|------|-------------|
 | `user_id` | UUID | PRIMARY KEY |
-| `full_name` | STRING | NOT NULL |
+| `first_name` | STRING | NOT NULL |
+| `last_name` | STRING | NOT NULL |
 | `phone_number` | STRING | |
 
 ### Table: `wallets`
@@ -42,6 +43,7 @@
 | `amount` | BIGINT | NOT NULL |
 | `type` | ENUM | NOT NULL |
 | `desc` | STRING | |
+| `created_at` | TIMESTAMP | NOT NULL |
 
 ---
 
