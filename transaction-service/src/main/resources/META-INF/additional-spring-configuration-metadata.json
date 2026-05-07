@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "JWT signing secret key (Base64 encoded, min 256-bit)"
+    },
+    {
+      "name": "production.service.url",
+      "type": "java.lang.String",
+      "description": "Base URL of the external production service"
+    }
+  ]
+}

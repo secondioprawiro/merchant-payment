@@ -1,0 +1,61 @@
+services:
+
+  auth-db:
+    image: postgres:16
+    container_name: auth-db
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5431:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+
+  user-wallet-db:
+    image: postgres:16
+    container_name: user-wallet-db
+    environment:
+      POSTGRES_DB: user_wallet_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - user-wallet-db-data:/var/lib/postgresql/data
+
+  production-db:
+    image: postgres:16
+    container_name: production-db
+    environment:
+      POSTGRES_DB: production_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - production-db-data:/var/lib/postgresql/data
+
+  transaction-db:
+    image: postgres:16
+    container_name: transaction-db
+    environment:
+      POSTGRES_DB: transaction_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - transaction-db-data:/var/lib/postgresql/data
+
+  kafka:
+    image: apache/kafka:3.9.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+
+volumes:
+  auth-db-data:
+  user-wallet-db-data:
+  production-db-data:
+  transaction-db-data:
