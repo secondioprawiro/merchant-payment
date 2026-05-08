@@ -16,8 +16,7 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/merchant/internal/**").permitAll()
-                .anyRequest().authenticated()
+                    .anyRequest().permitAll()
             );
         return http.build();
     }

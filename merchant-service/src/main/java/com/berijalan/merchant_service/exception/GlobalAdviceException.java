@@ -27,6 +27,13 @@ public class GlobalAdviceException {
                 .body(BaseResponse.failed(exception.getMessage()));
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<BaseResponse<?>> handleForbidden(ForbiddenException exception) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(BaseResponse.failed(exception.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse<Object>>handleMethodArgumentNotValid(MethodArgumentNotValidException exception){
         ArrayList<String> errorMessage = new ArrayList<>();

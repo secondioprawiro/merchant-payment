@@ -1,22 +1,30 @@
 package com.berijalan.merchant_service.service.impl;
 
+import com.berijalan.merchant_service.client.AuthFeignClient;
+import com.berijalan.merchant_service.client.dto.ResInternalAccountDto;
 import com.berijalan.merchant_service.dto.request.ReqInternalCreateMerchantDto;
+import com.berijalan.merchant_service.dto.response.ResDetailMerchantDto;
+import com.berijalan.merchant_service.dto.response.ResMerchantDto;
 import com.berijalan.merchant_service.entity.MerchantEntity;
+import com.berijalan.merchant_service.exception.DataNotFoundException;
 import com.berijalan.merchant_service.repository.MerchantRepository;
 import com.berijalan.merchant_service.service.MerchantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class MerchantServiceImpl implements MerchantService {
 
     private final MerchantRepository merchantRepository;
+    private final AuthFeignClient authFeignClient;
 
     @Override
-    public MerchantEntity createMerchant(ReqInternalCreateMerchantDto request) {
+    public void createMerchant(ReqInternalCreateMerchantDto request) {
         String kodeMerchant = generateKodeMerchant();
 
         MerchantEntity merchant = MerchantEntity.builder()
@@ -26,7 +34,26 @@ public class MerchantServiceImpl implements MerchantService {
                 .status(MerchantEntity.Status.ACTIVE)
                 .build();
 
-        return merchantRepository.save(merchant);
+        merchantRepository.save(merchant);
+    }
+
+    @Override
+    public List<ResMerchantDto> getAllMerchants() {
+        return merchantRepository.findAll().stream()
+                .map(m -> new ResMerchantDto(m.getKodeMerchant(), m.getNamaMerchant()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ResDetailMerchantDto getDetailMerchant(UUID merchantId) {
+        MerchantEntity merchant = merchantRepository.findById(merchantId)
+                .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
+
+        ResInternalAccountDto account = authFeignClient
+                .getAccountById(UUID.fromString(merchant.getAccountId()))
+                .getData();
+
+        return new ResDetailMerchantDto(merchant.getNamaMerchant(), account.getEmail());
     }
 
     private String generateKodeMerchant() {

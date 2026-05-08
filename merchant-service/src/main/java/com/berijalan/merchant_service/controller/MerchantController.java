@@ -2,13 +2,16 @@ package com.berijalan.merchant_service.controller;
 
 import com.berijalan.merchant_service.dto.request.ReqInternalCreateMerchantDto;
 import com.berijalan.merchant_service.dto.response.BaseResponse;
+import com.berijalan.merchant_service.dto.response.ResDetailMerchantDto;
+import com.berijalan.merchant_service.dto.response.ResMerchantDto;
+import com.berijalan.merchant_service.exception.ForbiddenException;
 import com.berijalan.merchant_service.service.MerchantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/merchant")
@@ -21,5 +24,23 @@ public class MerchantController {
     public ResponseEntity<BaseResponse<Void>> createMerchant(@RequestBody ReqInternalCreateMerchantDto request) {
         merchantService.createMerchant(request);
         return ResponseEntity.ok(BaseResponse.success("Merchant created", null));
+    }
+
+    @GetMapping
+    public ResponseEntity<BaseResponse<List<ResMerchantDto>>> getAllMerchants(
+            @RequestHeader("X-User-Role") String role) {
+        if (!"ADMIN".equals(role)) {
+            throw new ForbiddenException("Access denied");
+        }
+        List<ResMerchantDto> merchants = merchantService.getAllMerchants();
+        return ResponseEntity.ok(BaseResponse.success("Success", merchants));
+    }
+
+    @GetMapping("/{merchantId}")
+    public ResponseEntity<BaseResponse<ResDetailMerchantDto>> getDetailMerchant(
+            @PathVariable UUID merchantId,
+            @RequestHeader("X-User-Role") String role) {
+        ResDetailMerchantDto detail = merchantService.getDetailMerchant(merchantId);
+        return ResponseEntity.ok(BaseResponse.success("Success", detail));
     }
 }

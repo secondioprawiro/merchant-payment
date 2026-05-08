@@ -4,6 +4,7 @@ import com.berijalan.auth_service.client.MerchantFeignClient;
 import com.berijalan.auth_service.dto.request.ReqCreateAccDto;
 import com.berijalan.auth_service.dto.request.ReqCreateMerchantDto;
 import com.berijalan.auth_service.dto.request.ReqLoginDto;
+import com.berijalan.auth_service.dto.response.ResInternalAccountDto;
 import com.berijalan.auth_service.entity.AuthEntity;
 import com.berijalan.auth_service.exception.BadRequestException;
 import com.berijalan.auth_service.exception.DataNotFoundException;
@@ -14,6 +15,8 @@ import com.berijalan.auth_service.utils.ResponseJwt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -64,5 +67,12 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtUtil.generateToken(authEntity.getEmail(), authEntity.getAccountId().toString());
         return new ResponseJwt(authEntity.getEmail(), token);
+    }
+
+    @Override
+    public ResInternalAccountDto getAccountById(UUID accountId) {
+        AuthEntity authEntity = authRepository.findById(accountId)
+                .orElseThrow(() -> new DataNotFoundException("Account tidak ditemukan"));
+        return new ResInternalAccountDto(authEntity.getEmail());
     }
 }
