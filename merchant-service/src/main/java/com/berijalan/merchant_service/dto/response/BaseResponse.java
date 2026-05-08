@@ -1,4 +1,4 @@
-package com.berijalan.auth_service.dto.response;
+package com.berijalan.merchant_service.dto.response;
 
 
 import lombok.AllArgsConstructor;
