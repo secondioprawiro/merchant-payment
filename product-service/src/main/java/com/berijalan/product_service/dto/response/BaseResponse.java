@@ -1,4 +1,4 @@
-package com.berijalan.merchant_service.dto.response;
+package com.berijalan.product_service.dto.response;
 
 
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BaseResponse <T> {
+public class BaseResponse<T> {
     private String message;
     private T data;
 

@@ -1,7 +1,7 @@
-package com.berijalan.auth_service.exception;
+package com.berijalan.product_service.exception;
 
 
-import com.berijalan.auth_service.dto.response.BaseResponse;
+import com.berijalan.product_service.dto.response.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

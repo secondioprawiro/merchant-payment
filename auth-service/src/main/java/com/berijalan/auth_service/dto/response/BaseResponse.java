@@ -25,4 +25,10 @@ public class BaseResponse <T> {
         response.setMessage(msg);
         return response;
     }
+
+    public static <T> BaseResponse<T> failed(String msg, T data){
+        BaseResponse<T> response = new BaseResponse<>();
+        response.setMessage(msg);
+        return response;
+    }
 }
