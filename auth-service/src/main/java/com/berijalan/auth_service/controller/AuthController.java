@@ -2,6 +2,7 @@ package com.berijalan.auth_service.controller;
 
 import com.berijalan.auth_service.dto.request.ReqCreateAccDto;
 import com.berijalan.auth_service.dto.request.ReqLoginDto;
+import com.berijalan.auth_service.dto.request.ReqUpdateAccountDto;
 import com.berijalan.auth_service.dto.response.BaseResponse;
 import com.berijalan.auth_service.dto.response.ResInternalAccountDto;
 import com.berijalan.auth_service.service.AuthService;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,5 +45,13 @@ public class AuthController {
     public ResponseEntity<BaseResponse<ResInternalAccountDto>> getAccountById(@PathVariable UUID accountId) {
         ResInternalAccountDto data = authService.getAccountById(accountId);
         return ResponseEntity.ok(BaseResponse.success("Success", data));
+    }
+
+    @PutMapping("/internal/account/{accountId}")
+    public ResponseEntity<BaseResponse<ResInternalAccountDto>> updateAccount(
+            @PathVariable UUID accountId,
+            @RequestBody ReqUpdateAccountDto request) {
+        ResInternalAccountDto data = authService.updateAccount(accountId, request);
+        return ResponseEntity.ok(BaseResponse.success("Account updated", data));
     }
 }
