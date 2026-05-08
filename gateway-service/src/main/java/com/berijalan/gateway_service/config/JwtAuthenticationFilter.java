@@ -73,8 +73,8 @@ public class JwtAuthenticationFilter implements WebFilter {
     }
 
     private boolean isPublicEndpoint(String path) {
-        return path.contains("/auth/register")
-                || path.contains("/auth/login")
+        return path.contains("/gateway/auth/register")
+                || path.contains("/gateway/auth/login")
                 || path.contains("/actuator");
     }
 

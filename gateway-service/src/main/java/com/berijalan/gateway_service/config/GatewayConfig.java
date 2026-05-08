@@ -12,11 +12,13 @@ public class GatewayConfig {
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("auth-service", r -> r
-                        .path("/auth/**")
+                        .path("/gateway/auth/**")
+                        .filters(f -> f.stripPrefix(1))
                         .uri("lb://auth-service")
                 )
                 .route("merchant-service", r -> r
-                        .path("/merchants/**", "/merchant/**", "/products/**")
+                        .path("/gateway/merchants/**", "/gateway/merchant/**", "/gateway/products/**")
+                        .filters(f -> f.stripPrefix(1))
                         .uri("lb://merchant-service")
                 )
                 .build();

@@ -35,12 +35,4 @@ eureka:
 jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
 
-cache:
-  merchant:
-    ttl: 300
-  product:
-    ttl: 3600
 
-external:
-  provider:
-    service-name: merchant-service

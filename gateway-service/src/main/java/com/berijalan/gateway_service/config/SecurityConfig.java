@@ -24,8 +24,8 @@ public class SecurityConfig {
                 .logout(ServerHttpSecurity.LogoutSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(
-                                "/auth/register",
-                                "/auth/login",
+                                "/gateway/auth/register",
+                                "/gateway/auth/login",
                                 "/actuator/**"
                         )
                         .permitAll()
