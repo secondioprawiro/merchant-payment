@@ -1,98 +1,104 @@
 # Services Database Schema
 
+> **Project 3 — Pulsa & PLN via Merchant**
+>
+> Single shared PostgreSQL database `berijalan_db` (port 5432). All services connect to the same DB but logically own their own tables.
+
 ---
 
-## 1. Auth Service DB
+## 1. Auth Service
 
-### Table: `accounts`
+### Table: `mst_account`
+
+Owned by: **auth-service**
 
 | Column | Type | Constraints |
 |--------|------|-------------|
 | `account_id` | UUID | PRIMARY KEY |
-| `email` | STRING | UNIQUE, NOT NULL |
-| `password` | STRING (hashed) | NOT NULL |
-| `role` | ENUM(`user`, `admin`) | DEFAULT `user` |
+| `email` | VARCHAR | UNIQUE, NOT NULL |
+| `password` | VARCHAR (BCrypt hashed) | NOT NULL |
+| `role` | ENUM(`ADMIN`, `USER`) | DEFAULT `USER` |
 | `created_at` | TIMESTAMP | NOT NULL |
+
+**Purpose:** Admin login. Project 3 hanya butuh role `ADMIN` untuk endpoint CRUD merchant. Token JWT berisi `userId`, `email`, `role`.
 
 ---
 
-## 2. User & Wallet Service DB
+## 2. Merchant Service
 
-### Table: `profiles`
+### Table: `mst_merchant`
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `user_id` | UUID | PRIMARY KEY |
-| `first_name` | STRING | NOT NULL |
-| `last_name` | STRING | NOT NULL |
-| `phone_number` | STRING | |
-
-### Table: `wallets`
+Owned by: **merchant-service**
 
 | Column | Type | Constraints |
 |--------|------|-------------|
-| `user_id` | UUID | PRIMARY KEY |
-| `balance` | BIGINT | NOT NULL |
+| `merchant_id` | UUID | PRIMARY KEY |
+| `nama_merchant` | VARCHAR | NOT NULL |
+| `kode_merchant` | VARCHAR | UNIQUE, NOT NULL |
+| `status` | ENUM(`ACTIVE`, `INACTIVE`) | NOT NULL, DEFAULT `ACTIVE` |
+| `created_date` | TIMESTAMP | NOT NULL |
+| `updated_date` | TIMESTAMP | NOT NULL |
 
-### Table: `wallet_mutations`
+### Table: `mst_merchant_transaction`
+
+Owned by: **merchant-service**
 
 | Column | Type | Constraints |
 |--------|------|-------------|
-| `id` | UUID | PRIMARY KEY |
-| `user_id` | UUID | FOREIGN KEY → `wallets.user_id` |
-| `amount` | BIGINT | NOT NULL |
-| `type` | ENUM | NOT NULL |
-| `desc` | STRING | |
-| `created_at` | TIMESTAMP | NOT NULL |
+| `transaction_id` | UUID | PRIMARY KEY |
+| `merchant_id` | UUID | NOT NULL — ref logis ke `mst_merchant.merchant_id` |
+| `product_id` | VARCHAR | NOT NULL — ref ke `DigitalProduct` enum (PULSA_10K, PLN_50K, dll) |
+| `nomor_tujuan` | VARCHAR | NOT NULL — nomor HP atau nomor meter PLN |
+| `amount` | BIGINT | NOT NULL — harga produk saat transaksi |
+| `status` | ENUM(`SUCCESS`, `FAILED`) | NOT NULL |
+| `failure_reason` | VARCHAR | NULL jika SUCCESS |
+| `transaction_date` | TIMESTAMP | NOT NULL |
+
+**Index:** `merchant_id`, `transaction_date`
+
+### Static — `DigitalProduct` enum (tidak ada di DB)
+
+| Product ID | Name | Type | Price |
+|------------|------|------|-------|
+| `PULSA_10K` | Pulsa 10.000 | PULSA | 10.000 |
+| `PULSA_25K` | Pulsa 25.000 | PULSA | 25.000 |
+| `PULSA_50K` | Pulsa 50.000 | PULSA | 50.000 |
+| `PLN_20K` | Token PLN 20.000 | PLN | 20.000 |
+| `PLN_50K` | Token PLN 50.000 | PLN | 50.000 |
+| `PLN_100K` | Token PLN 100.000 | PLN | 100.000 |
 
 ---
 
-## 3. Production Service DB
+## 3. Production Service (Mock External Provider)
 
-> **Status: External / Third-Party** — read-only via API, tidak ada kontrol langsung terhadap database ini.
-
-### Table: `categories`
-
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | INT | PRIMARY KEY |
-| `name` | STRING | NOT NULL |
-| `type` | ENUM | NOT NULL |
-
-### Table: `products`
-
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | INT | PRIMARY KEY |
-| `category_id` | INT | FOREIGN KEY → `categories.id` |
-| `name` | STRING | NOT NULL |
-| `price` | BIGINT | NOT NULL |
-| `is_active` | BOOLEAN | NOT NULL |
+> **Stateless** — tidak ada DB. Hanya simulasi panggilan ke Telkom (Pulsa) atau PLN (Token).
+>
+> Endpoint: `POST /external/purchase`. Hasil random SUCCESS/FAILED dengan probabilitas yang dikonfigurasi via `provider.success-rate` (default 0.7).
 
 ---
 
-## 4. Transaction Service DB
+## Redis Cache Keys
 
-### Table: `product_prices`
+Cache disimpan di Redis (port 6379), digunakan oleh **merchant-service**:
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `product_id` | INT | PRIMARY KEY (ref ke external Product Service) |
-| `selling_price` | BIGINT | NOT NULL |
-| `admin_fee` | BIGINT | NOT NULL |
-| `is_active` | BOOLEAN | NOT NULL |
-| `updated_at` | TIMESTAMP | NOT NULL |
+| Cache Name | Key Pattern | TTL | Isi |
+|------------|-------------|-----|-----|
+| `merchant` | `merchant::<merchant_id>` | 300 detik | `MerchantResponse` JSON |
+| `merchant_by_code` | `merchant_by_code::<kode>` | 300 detik | `MerchantResponse` JSON |
+| `products` | `products::all`, `products::<product_id>` | 3600 detik | `List<ProductResponse>` / `ProductResponse` JSON |
 
-### Table: `transactions`
+**Invalidate:** Cache `merchant` dan `merchant_by_code` di-evict otomatis saat create/update/delete merchant.
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID / BIGINT | PRIMARY KEY |
-| `user_id` | UUID / BIGINT | ref → `profiles.user_id` |
-| `product_id` | INT | ref → `products.id` |
-| `target_number` | STRING | NOT NULL |
-| `base_price` | BIGINT | NOT NULL |
-| `markup_amount` | BIGINT | NOT NULL |
-| `status` | ENUM(`pending`, `processing`, `success`, `failed`) | NOT NULL |
-| `sn` | STRING | NULLABLE — Serial Number / Token PLN (diisi jika sukses) |
-| `created_at` | TIMESTAMP | NOT NULL |
+---
+
+## Service Ports
+
+| Service | Port |
+|---------|------|
+| registry-service (Eureka) | 8761 |
+| gateway-service | 8080 |
+| auth-service | 8001 |
+| production-service | 8003 |
+| merchant-service | 8004 |
+| postgres | 5432 |
+| redis | 6379 |

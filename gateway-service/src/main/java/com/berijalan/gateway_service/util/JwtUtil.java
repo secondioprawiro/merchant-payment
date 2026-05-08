@@ -16,6 +16,9 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Value("${jwt.expiration}")
+    private Long expiration;
+
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
@@ -28,15 +31,10 @@ public class JwtUtil {
         return parseClaims(token).get("role", String.class);
     }
 
-    public Long extractUserId(String token) {
+    public String extractUserId(String token) {
         Claims claims = parseClaims(token);
-        Object userId = claims.get("id");
-        if (userId instanceof Integer) {
-            return ((Integer) userId).longValue();
-        } else if (userId instanceof Long) {
-            return (Long) userId;
-        }
-        return null;
+        Object userId = claims.get("userId");
+        return userId != null ? userId.toString() : null;
     }
 
     public boolean validateToken(String token) {

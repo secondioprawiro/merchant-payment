@@ -1,6 +1,6 @@
 spring:
   application:
-    name: auth-service
+    name: merchant-service
   datasource:
     url: jdbc:postgresql://localhost:5432/berijalan_db
     username: postgres
@@ -14,9 +14,16 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+  cache:
+    type: redis
 
 server:
-  port: 8001
+  port: 8004
 
 eureka:
   client:
@@ -27,4 +34,13 @@ eureka:
 
 jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-  expiration: 86400000
+
+cache:
+  merchant:
+    ttl: 300
+  product:
+    ttl: 3600
+
+external:
+  provider:
+    service-name: merchant-service
