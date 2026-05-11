@@ -38,6 +38,9 @@ public class MerchantTransactionEntity {
     @Column(name = "product_id", nullable = false)
     private String productId;
 
+    @Column(name = "product_name", nullable = false)
+    private String productName;
+
     @Column(name = "nomor_tujuan", nullable = false)
     private String nomorTujuan;
 

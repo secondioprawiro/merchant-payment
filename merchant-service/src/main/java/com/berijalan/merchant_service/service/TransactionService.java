@@ -4,7 +4,10 @@ import com.berijalan.merchant_service.dto.request.ReqTransactionDto;
 import com.berijalan.merchant_service.entity.MerchantTransactionEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 
 public interface TransactionService {
     MerchantTransactionEntity buyProduct(String userId, ReqTransactionDto request);
+    MerchantTransactionEntity getTransactionById(String userId, String role, UUID transactionId);
 }

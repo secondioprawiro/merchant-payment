@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -69,6 +70,7 @@ public class TransactionServiceImpl implements TransactionService {
         MerchantTransactionEntity transaction = new MerchantTransactionEntity();
         transaction.setMerchantId(merchant.getMerchantId());
         transaction.setProductId(request.getProductId());
+        transaction.setProductName(productResponse.getProductName());
         transaction.setNomorTujuan(request.getNomorTujuan());
         transaction.setRefId(productResponse.getRefId());
         transaction.setStatus(MerchantTransactionEntity.Status.valueOf(productResponse.getStatus().toUpperCase()));
@@ -77,5 +79,20 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setTransactionDate(LocalDateTime.now());
 
         return transactionRepository.save(transaction);
+    }
+
+    @Override
+    public MerchantTransactionEntity getTransactionById(String userId, String role, UUID transactionId) {
+        MerchantTransactionEntity transaction = transactionRepository.findByTransactionId(transactionId)
+                .orElseThrow(() -> new DataNotFoundException("Transaksi tidak ditemukan"));
+
+        if (!role.equals("ADMIN")){
+            MerchantEntity merchant = merchantRepository.findByAccountId(userId)
+                    .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
+            if (!transaction.getMerchantId().toString().equals((merchant.getMerchantId().toString()))){
+                throw new BadRequestException("Tidak memiliki akses ke transaksi ini");
+            }
+        }
+        return transaction;
     }
 }

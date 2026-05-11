@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final List<Product> products = List.of(
-            new Product("PULSA_10K", 10000L, 11000L, "PULSA", "AVAILABLE"),
-            new Product("PULSA_25K", 25000L, 26000L, "PULSA",  "AVAILABLE"),
-            new Product("PULSA_50K", 10000L, 11000L, "PULSA", "AVAILABLE"),
-            new Product("PULSA_100K",   10000L, 11000L, "PULSA", "AVAILABLE"),
-            new Product("TOKEN_PLN_20K",  20000L, 21500L, "PLN", "AVAILABLE"),
-            new Product("TOKEN_PLN_50K",  50000L, 51500L, "PLN", "AVAILABLE"),
-            new Product("TOKEN_PLN_100K", 100000L, 101500L, "PLN", "AVAILABLE"),
-            new Product("TOKEN_PLN_1000K", 1000000L, 1150000L, "PLN", "NOT AVAILABLE")
+            new Product("PULSA_10K", "PULSA 10.000",10000L, 11000L, "PULSA", "AVAILABLE"),
+            new Product("PULSA_25K", "PULSA 25.000",25000L, 26000L, "PULSA",  "AVAILABLE"),
+            new Product("PULSA_50K", "PULSA 50.000",10000L, 11000L, "PULSA", "AVAILABLE"),
+            new Product("PULSA_100K",  "PULSA 100.000", 10000L, 11000L, "PULSA", "AVAILABLE"),
+            new Product("TOKEN_PLN_20K", "TOKEN PLN 20.000", 20000L, 21500L, "PLN", "AVAILABLE"),
+            new Product("TOKEN_PLN_50K", "TOKEN PLN 50.000", 50000L, 51500L, "PLN", "AVAILABLE"),
+            new Product("TOKEN_PLN_100K", "TOKEN PLN 100.000", 100000L, 101500L, "PLN", "AVAILABLE"),
+            new Product("TOKEN_PLN_1000K", "TOKEN PLN 1000.000", 1000000L, 1150000L, "PLN", "NOT AVAILABLE")
     );
 
     @Override
@@ -57,6 +57,7 @@ public class ProductServiceImpl implements ProductService {
             return ResTransactionDto.builder()
                     .refId("REF" + System.currentTimeMillis())
                     .productId(request.getProductId())
+                    .productName(product.getProductName())
                     .nomorTujuan(request.getNomorTujuan())
                     .price(product.getPrice())
                     .status("SUCCESS")
@@ -73,6 +74,7 @@ public class ProductServiceImpl implements ProductService {
             return ResTransactionDto.builder()
                     .refId("REF" + System.currentTimeMillis())
                     .productId(request.getProductId())
+                    .productName(product.getProductName())
                     .nomorTujuan(request.getNomorTujuan())
                     .price(product.getPrice())
                     .status("FAILED")

@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class ResTransactionDto {
     private String refId;
     private String productId;
+    private String productName;
     private String nomorTujuan;
     private Long price;
     private String status;
