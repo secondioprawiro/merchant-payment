@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -32,6 +33,15 @@ public class TransactionController {
         );
     }
 
+    @GetMapping()
+    public ResponseEntity<BaseResponse<?>> getAllTransactions(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-User-Role") String role
+    ){
+        List<MerchantTransactionEntity> transaction = transactionService.getAllTransactions(userId, role);
+        return ResponseEntity.ok(BaseResponse.success("Success", transaction));
+    }
+
     @GetMapping("{productId}")
     public ResponseEntity<BaseResponse<?>> getTransactionById(
             @RequestHeader("X-User-Id") String userId,
@@ -41,6 +51,7 @@ public class TransactionController {
         MerchantTransactionEntity transaction = transactionService.getTransactionById(userId, role, productId);
         return ResponseEntity.ok(BaseResponse.success("Success", transaction));
     }
+
 
 
 

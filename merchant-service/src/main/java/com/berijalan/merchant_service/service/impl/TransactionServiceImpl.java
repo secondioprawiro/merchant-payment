@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -79,6 +80,17 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setTransactionDate(LocalDateTime.now());
 
         return transactionRepository.save(transaction);
+    }
+
+    @Override
+    public List<MerchantTransactionEntity> getAllTransactions(String userId, String role) {
+        if (role.equals("ADMIN")) {
+            return transactionRepository.findAll();
+        }else{
+            MerchantEntity merchant = merchantRepository.findByAccountId(userId)
+                    .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
+            return transactionRepository.findByMerchantId(merchant.getMerchantId());
+        }
     }
 
     @Override
