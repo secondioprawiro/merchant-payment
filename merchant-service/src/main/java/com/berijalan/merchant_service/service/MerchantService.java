@@ -13,4 +13,5 @@ public interface MerchantService {
     List<ResMerchantDto> getAllMerchants();
     ResDetailMerchantDto getDetailMerchant(UUID merchantId);
     ResDetailMerchantDto updateMerchant(UUID merchantId, ReqUpdateMerchantDto request, String userId, String role);
+    void deleteMerchant(UUID merchantId, String userId, String role);
 }

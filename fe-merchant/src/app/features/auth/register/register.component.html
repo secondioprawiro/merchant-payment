@@ -1,0 +1,72 @@
+<div class="auth-page">
+  <div class="auth-card">
+
+    <div class="auth-brand">
+      <span class="brand-name">VoltaPay</span>
+      <span class="brand-sub">Merchant Portal</span>
+    </div>
+
+    <div class="auth-header">
+      <h1>Buat akun baru</h1>
+      <p>Daftarkan merchant Anda untuk mulai berjualan</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+
+      <div class="field">
+        <label for="full_name">Nama Toko</label>
+        <input
+          id="full_name"
+          type="text"
+          formControlName="full_name"
+          placeholder="Toko Berkah"
+          [class.invalid]="form.get('full_name')?.invalid && form.get('full_name')?.touched"
+        />
+        @if (form.get('full_name')?.invalid && form.get('full_name')?.touched) {
+          <span class="error">Nama Toko wajib diisi</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="merchant@email.com"
+          [class.invalid]="form.get('email')?.invalid && form.get('email')?.touched"
+        />
+        @if (form.get('email')?.invalid && form.get('email')?.touched) {
+          <span class="error">Email tidak valid</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="••••••••"
+            [class.invalid]="form.get('password')?.invalid && form.get('password')?.touched"
+          />
+          <button type="button" class="toggle-pw" (click)="showPassword = !showPassword">
+            <span class="material-icons-round">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+        @if (form.get('password')?.invalid && form.get('password')?.touched) {
+          <span class="error">Password minimal 6 karakter</span>
+        }
+      </div>
+
+      <button type="submit" class="btn-primary">Daftar sekarang</button>
+
+    </form>
+
+    <p class="auth-switch">
+      Sudah punya akun? <a routerLink="/login">Masuk di sini</a>
+    </p>
+
+  </div>
+</div>

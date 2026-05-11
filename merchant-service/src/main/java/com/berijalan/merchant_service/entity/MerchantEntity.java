@@ -50,10 +50,19 @@ public class MerchantEntity implements Serializable {
     @Column(name = "updated_date", nullable = false)
     private LocalDateTime updatedDate;
 
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @PrePersist
     public void prePersist() {
         if (this.status == null) {
             this.status = Status.ACTIVE;
+        }
+        if (this.isDeleted == null) {
+            this.isDeleted = false;
         }
     }
 }

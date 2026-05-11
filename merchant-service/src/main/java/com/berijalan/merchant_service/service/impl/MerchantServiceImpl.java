@@ -15,6 +15,7 @@ import com.berijalan.merchant_service.service.MerchantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,14 +43,14 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     public List<ResMerchantDto> getAllMerchants() {
-        return merchantRepository.findAll().stream()
+        return merchantRepository.findAllByIsDeletedFalse().stream()
                 .map(m -> new ResMerchantDto(m.getKodeMerchant(), m.getNamaMerchant()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public ResDetailMerchantDto getDetailMerchant(UUID merchantId) {
-        MerchantEntity merchant = merchantRepository.findById(merchantId)
+        MerchantEntity merchant = merchantRepository.findByMerchantIdAndIsDeletedFalse(merchantId)
                 .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
 
         ResInternalAccountDto account = authFeignClient
@@ -61,7 +62,7 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     public ResDetailMerchantDto updateMerchant(UUID merchantId, ReqUpdateMerchantDto request, String userId, String role) {
-        MerchantEntity merchant = merchantRepository.findById(merchantId)
+        MerchantEntity merchant = merchantRepository.findByMerchantIdAndIsDeletedFalse(merchantId)
                 .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
 
         if (!"ADMIN".equals(role) && !merchant.getAccountId().equals(userId)) {
@@ -79,6 +80,21 @@ public class MerchantServiceImpl implements MerchantService {
                 .getData();
 
         return new ResDetailMerchantDto(merchant.getNamaMerchant(), updatedAccount.getEmail());
+    }
+
+    @Override
+    public void deleteMerchant(UUID merchantId, String userId, String role) {
+        MerchantEntity merchant = merchantRepository.findByMerchantIdAndIsDeletedFalse(merchantId)
+                .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
+
+        if (!"ADMIN".equals(role) && !merchant.getAccountId().equals(userId)) {
+            throw new ForbiddenException("Access denied");
+        }
+
+        merchant.setIsDeleted(true);
+        merchant.setStatus(MerchantEntity.Status.INACTIVE);
+        merchant.setDeletedAt(LocalDateTime.now());
+        merchantRepository.save(merchant);
     }
 
     private String generateKodeMerchant() {
