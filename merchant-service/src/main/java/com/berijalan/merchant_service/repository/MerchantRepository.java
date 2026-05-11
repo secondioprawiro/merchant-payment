@@ -11,4 +11,5 @@ public interface MerchantRepository extends JpaRepository<MerchantEntity, UUID> 
     boolean existsByKodeMerchant(String kodeMerchant);
     List<MerchantEntity> findAllByIsDeletedFalse();
     Optional<MerchantEntity> findByMerchantIdAndIsDeletedFalse(UUID merchantId);
+    Optional<MerchantEntity> findByAccountId(String userId);
 }

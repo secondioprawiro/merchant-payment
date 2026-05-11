@@ -1,12 +1,17 @@
 package com.berijalan.merchant_service.controller;
 
 import com.berijalan.merchant_service.dto.request.ReqInternalCreateMerchantDto;
+import com.berijalan.merchant_service.dto.request.ReqTransactionDto;
 import com.berijalan.merchant_service.dto.request.ReqUpdateMerchantDto;
 import com.berijalan.merchant_service.dto.response.BaseResponse;
 import com.berijalan.merchant_service.dto.response.ResDetailMerchantDto;
 import com.berijalan.merchant_service.dto.response.ResMerchantDto;
+import com.berijalan.merchant_service.entity.MerchantTransactionEntity;
 import com.berijalan.merchant_service.exception.ForbiddenException;
 import com.berijalan.merchant_service.service.MerchantService;
+import com.berijalan.merchant_service.service.ProductService;
+import com.berijalan.merchant_service.service.TransactionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +25,8 @@ import java.util.UUID;
 public class MerchantController {
 
     private final MerchantService merchantService;
+    private final ProductService productService;
+    private final TransactionService transactionService;
 
     @PostMapping("/internal/create")
     public ResponseEntity<BaseResponse<Void>> createMerchant(@RequestBody ReqInternalCreateMerchantDto request) {
@@ -62,5 +69,30 @@ public class MerchantController {
             @RequestHeader("X-User-Role") String role) {
         merchantService.deleteMerchant(merchantId, userId, role);
         return ResponseEntity.ok(BaseResponse.success("Merchant deleted", null));
+    }
+
+    @GetMapping("/product/all")
+    public ResponseEntity getAllProduct(
+            @RequestParam(required = false) String type
+    ) {
+        return ResponseEntity.ok(productService.getAllProduct(type));
+    }
+
+    @GetMapping("/product/{productId}")
+    public ResponseEntity getProductById(@PathVariable String productId) {
+        return ResponseEntity.ok(productService.getProductById(productId));
+    }
+
+    @PostMapping("/product/transaction")
+    public ResponseEntity<BaseResponse<?>> buyProduct(
+            @RequestHeader("X-User-Id") String userId,
+            @Valid @RequestBody ReqTransactionDto request
+    ) {
+        MerchantTransactionEntity transaction = transactionService.buyProduct(userId, request);
+        return ResponseEntity.ok(
+                transaction.getStatus().equals(MerchantTransactionEntity.Status.FAILED)
+                        ? BaseResponse.failed("Transaksi gagal", transaction)
+                        : BaseResponse.success("Transaksi berhasil", transaction)
+        );
     }
 }

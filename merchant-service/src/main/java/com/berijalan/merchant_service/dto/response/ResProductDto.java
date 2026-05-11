@@ -1,13 +1,13 @@
-package com.berijalan.product_service.model;
+package com.berijalan.merchant_service.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Product {
+@AllArgsConstructor
+public class ResProductDto {
     private String productId;
     private Long nominal;
     private Long price;

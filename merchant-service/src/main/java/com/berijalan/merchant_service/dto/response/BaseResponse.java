@@ -1,6 +1,7 @@
 package com.berijalan.merchant_service.dto.response;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseResponse <T> {
     private String message;
     private T data;
@@ -29,6 +31,7 @@ public class BaseResponse <T> {
     public static <T> BaseResponse<T> failed(String msg, T data){
         BaseResponse<T> response = new BaseResponse<>();
         response.setMessage(msg);
+        response.setData(data);
         return response;
     }
 }

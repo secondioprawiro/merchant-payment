@@ -29,6 +29,7 @@ public class BaseResponse<T> {
     public static <T> BaseResponse<T> failed(String msg, T data){
         BaseResponse<T> response = new BaseResponse<>();
         response.setMessage(msg);
+        response.setData(data);
         return response;
     }
 }
