@@ -54,4 +54,13 @@ public class MerchantController {
         ResDetailMerchantDto updated = merchantService.updateMerchant(merchantId, request, userId, role);
         return ResponseEntity.ok(BaseResponse.success("Merchant updated", updated));
     }
+
+    @DeleteMapping("/{merchantId}")
+    public ResponseEntity<BaseResponse<Void>> deleteMerchant(
+            @PathVariable UUID merchantId,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-User-Role") String role) {
+        merchantService.deleteMerchant(merchantId, userId, role);
+        return ResponseEntity.ok(BaseResponse.success("Merchant deleted", null));
+    }
 }
