@@ -1,0 +1,50 @@
+<aside class="sidebar">
+  <div class="sidebar-inner">
+
+    <!-- Brand -->
+    <div class="brand">
+      <span class="brand-name">VoltaPay</span>
+      <span class="brand-sub">Merchant Portal</span>
+    </div>
+
+    <!-- Menu -->
+    <nav class="nav">
+      <span class="nav-section-label">MENU</span>
+      @for (item of menuItems; track item.route) {
+        <a
+          class="nav-item"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+        >
+          <span class="material-icons-round nav-icon">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <!-- Akun -->
+    <nav class="nav">
+      <span class="nav-section-label">AKUN</span>
+      @for (item of accountItems; track item.route) {
+        <a
+          class="nav-item"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+        >
+          <span class="material-icons-round nav-icon">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+  </div>
+
+  <!-- Merchant info -->
+  <div class="merchant-footer">
+    <div class="merchant-avatar">{{ merchant.initials }}</div>
+    <div class="merchant-info">
+      <span class="merchant-name">{{ merchant.name }}</span>
+      <span class="merchant-code">{{ merchant.code }}</span>
+    </div>
+  </div>
+</aside>
