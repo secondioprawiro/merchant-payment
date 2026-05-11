@@ -1,15 +1,13 @@
 package com.berijalan.merchant_service.controller;
 
-import com.berijalan.merchant_service.client.ProductFeignClient;
 import com.berijalan.merchant_service.dto.request.ReqInternalCreateMerchantDto;
 import com.berijalan.merchant_service.dto.request.ReqTransactionDto;
+import com.berijalan.merchant_service.dto.request.ReqUpdateMerchantDto;
 import com.berijalan.merchant_service.dto.response.BaseResponse;
 import com.berijalan.merchant_service.dto.response.ResDetailMerchantDto;
 import com.berijalan.merchant_service.dto.response.ResMerchantDto;
-import com.berijalan.merchant_service.dto.response.ResProductDto;
 import com.berijalan.merchant_service.entity.MerchantTransactionEntity;
 import com.berijalan.merchant_service.exception.ForbiddenException;
-import com.berijalan.merchant_service.repository.MerchantTransactionRepository;
 import com.berijalan.merchant_service.service.MerchantService;
 import com.berijalan.merchant_service.service.ProductService;
 import com.berijalan.merchant_service.service.TransactionService;
@@ -54,6 +52,15 @@ public class MerchantController {
         return ResponseEntity.ok(BaseResponse.success("Success", detail));
     }
 
+    @PutMapping("/{merchantId}")
+    public ResponseEntity<BaseResponse<ResDetailMerchantDto>> updateMerchant(
+            @PathVariable UUID merchantId,
+            @RequestBody ReqUpdateMerchantDto request,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-User-Role") String role) {
+        ResDetailMerchantDto updated = merchantService.updateMerchant(merchantId, request, userId, role);
+        return ResponseEntity.ok(BaseResponse.success("Merchant updated", updated));
+    }
 
     @GetMapping("/product/all")
     public ResponseEntity getAllProduct(
@@ -62,6 +69,10 @@ public class MerchantController {
         return ResponseEntity.ok(productService.getAllProduct(type));
     }
 
+    @GetMapping("/product/{productId}")
+    public ResponseEntity getProductById(@PathVariable String productId) {
+        return ResponseEntity.ok(productService.getProductById(productId));
+    }
 
     @PostMapping("/product/transaction")
     public ResponseEntity<BaseResponse<?>> buyProduct(

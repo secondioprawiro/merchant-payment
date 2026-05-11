@@ -4,6 +4,7 @@ import com.berijalan.auth_service.client.MerchantFeignClient;
 import com.berijalan.auth_service.dto.request.ReqCreateAccDto;
 import com.berijalan.auth_service.dto.request.ReqCreateMerchantDto;
 import com.berijalan.auth_service.dto.request.ReqLoginDto;
+import com.berijalan.auth_service.dto.request.ReqUpdateAccountDto;
 import com.berijalan.auth_service.dto.response.ResInternalAccountDto;
 import com.berijalan.auth_service.entity.AuthEntity;
 import com.berijalan.auth_service.exception.BadRequestException;
@@ -74,5 +75,25 @@ public class AuthServiceImpl implements AuthService {
         AuthEntity authEntity = authRepository.findById(accountId)
                 .orElseThrow(() -> new DataNotFoundException("Account tidak ditemukan"));
         return new ResInternalAccountDto(authEntity.getEmail());
+    }
+
+    @Override
+    public ResInternalAccountDto updateAccount(UUID accountId, ReqUpdateAccountDto request) {
+        AuthEntity authEntity = authRepository.findById(accountId)
+                .orElseThrow(() -> new DataNotFoundException("Account tidak ditemukan"));
+
+        if (request.getEmail() != null && !request.getEmail().equals(authEntity.getEmail())) {
+            if (authRepository.existsByEmailAndAccountIdNot(request.getEmail(), accountId)) {
+                throw new BadRequestException("Email sudah digunakan");
+            }
+            authEntity.setEmail(request.getEmail());
+        }
+
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            authEntity.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        AuthEntity saved = authRepository.save(authEntity);
+        return new ResInternalAccountDto(saved.getEmail());
     }
 }
