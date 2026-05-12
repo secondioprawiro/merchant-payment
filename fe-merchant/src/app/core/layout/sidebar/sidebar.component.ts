@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 
 interface NavItem {
   label: string;
@@ -15,6 +16,8 @@ interface NavItem {
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent {
+  private auth = inject(AuthService);
+
   menuItems: NavItem[] = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
     { label: 'Beli produk', icon: 'bolt', route: '/beli-produk' },
@@ -31,4 +34,8 @@ export class SidebarComponent {
     code: 'MCH-00421',
     initials: 'TB',
   };
+
+  logout() {
+    this.auth.logout();
+  }
 }
