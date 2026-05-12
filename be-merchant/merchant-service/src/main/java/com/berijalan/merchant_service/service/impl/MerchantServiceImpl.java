@@ -52,20 +52,28 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public ResDetailMerchantDto getDetailMerchant(UUID merchantId, String userId, String role) {
+    public ResDetailMerchantDto getDetailMerchant(UUID merchantId) {
         MerchantEntity merchant = merchantRepository.findByMerchantIdAndIsDeletedFalse(merchantId)
                 .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
-
-        if (!"ADMIN".equals(role) && !merchant.getAccountId().equals(userId)) {
-            log.warn("Access denied - userId={} tried to access merchantId={}", userId, merchantId);
-            throw new ForbiddenException("Access denied");
-        }
 
         ResInternalAccountDto account = authFeignClient
                 .getAccountById(UUID.fromString(merchant.getAccountId()))
                 .getData();
 
-        return new ResDetailMerchantDto(merchant.getNamaMerchant(), account.getEmail());
+        return new ResDetailMerchantDto(merchant.getMerchantId(), merchant.getNamaMerchant(), account.getEmail());
+    }
+
+    @Override
+    public ResDetailMerchantDto getMyMerchant(String userId) {
+        MerchantEntity merchant = merchantRepository.findByAccountId(userId)
+                .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
+
+        ResInternalAccountDto account = authFeignClient
+                .getAccountById(UUID.fromString(merchant.getAccountId()))
+                .getData();
+
+        log.info("Fetched own merchant: merchantId={}, userId={}", merchant.getMerchantId(), userId);
+        return new ResDetailMerchantDto(merchant.getMerchantId(), merchant.getNamaMerchant(), account.getEmail());
     }
 
     @Override
@@ -89,7 +97,7 @@ public class MerchantServiceImpl implements MerchantService {
                 .getData();
 
         log.info("Merchant updated: merchantId={}", merchantId);
-        return new ResDetailMerchantDto(merchant.getNamaMerchant(), updatedAccount.getEmail());
+        return new ResDetailMerchantDto(merchant.getMerchantId(), merchant.getNamaMerchant(), updatedAccount.getEmail());
     }
 
     @Override

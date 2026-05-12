@@ -44,12 +44,22 @@ public class MerchantController {
         return ResponseEntity.ok(BaseResponse.success("Success", merchants));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<BaseResponse<ResDetailMerchantDto>> getMyMerchant(
+            @RequestHeader("X-User-Id") String userId) {
+        ResDetailMerchantDto detail = merchantService.getMyMerchant(userId);
+        return ResponseEntity.ok(BaseResponse.success("Success", detail));
+    }
+
+    // admin only
     @GetMapping("/{merchantId}")
     public ResponseEntity<BaseResponse<ResDetailMerchantDto>> getDetailMerchant(
             @PathVariable UUID merchantId,
-            @RequestHeader("X-User-Id") String userId,
             @RequestHeader("X-User-Role") String role) {
-        ResDetailMerchantDto detail = merchantService.getDetailMerchant(merchantId, userId, role);
+        if (!"ADMIN".equals(role)) {
+            throw new ForbiddenException("Access denied");
+        }
+        ResDetailMerchantDto detail = merchantService.getDetailMerchant(merchantId);
         return ResponseEntity.ok(BaseResponse.success("Success", detail));
     }
 
