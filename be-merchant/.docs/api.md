@@ -136,9 +136,40 @@ Authorization: Bearer <token>
 
 ---
 
+### GET /gateway/merchant/me
+Ambil detail merchant milik user yang sedang login.  
+**Auth:** Required | **Role:** USER
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response 200 OK:**
+```json
+{
+  "message": "Success",
+  "data": {
+    "merchantId": "550e8400-e29b-41d4-a716-446655440000",
+    "namaMerchant": "Toko Saya",
+    "email": "merchant@example.com"
+  }
+}
+```
+
+**Response 404 — Merchant tidak ditemukan:**
+```json
+{
+  "message": "Merchant tidak ditemukan",
+  "data": null
+}
+```
+
+---
+
 ### GET /gateway/merchant/{merchantId}
 Ambil detail merchant beserta email akun.  
-**Auth:** Required | **Role:** ADMIN (semua merchant) atau USER (merchant milik sendiri)
+**Auth:** Required | **Role:** ADMIN
 
 **Headers:**
 ```
@@ -155,13 +186,14 @@ Authorization: Bearer <token>
 {
   "message": "Success",
   "data": {
+    "merchantId": "550e8400-e29b-41d4-a716-446655440000",
     "namaMerchant": "Toko Saya",
     "email": "merchant@example.com"
   }
 }
 ```
 
-**Response 403 — Bukan pemilik atau bukan ADMIN:**
+**Response 403 — Bukan ADMIN:**
 ```json
 {
   "message": "Access denied",
@@ -213,6 +245,7 @@ Authorization: Bearer <token>
 {
   "message": "Merchant updated",
   "data": {
+    "merchantId": "550e8400-e29b-41d4-a716-446655440000",
     "namaMerchant": "Toko Baru",
     "email": "baru@example.com"
   }
