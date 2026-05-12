@@ -2,9 +2,7 @@ package com.berijalan.merchant_service.service.impl;
 
 import com.berijalan.merchant_service.client.ProductFeignClient;
 import com.berijalan.merchant_service.dto.request.ReqTransactionDto;
-import com.berijalan.merchant_service.dto.response.BaseResponse;
-import com.berijalan.merchant_service.dto.response.ResProductDto;
-import com.berijalan.merchant_service.dto.response.ResTransactionDto;
+import com.berijalan.merchant_service.dto.response.*;
 import com.berijalan.merchant_service.entity.MerchantEntity;
 import com.berijalan.merchant_service.entity.MerchantTransactionEntity;
 import com.berijalan.merchant_service.exception.BadRequestException;
@@ -18,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -101,6 +101,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
+
     @Override
     public MerchantTransactionEntity getTransactionById(String userId, String role, UUID transactionId) {
         MerchantTransactionEntity transaction = transactionRepository.findByTransactionId(transactionId)
@@ -115,5 +116,52 @@ public class TransactionServiceImpl implements TransactionService {
             }
         }
         return transaction;
+    }
+
+    @Override
+    public ResAdminStatsDto getAdminStats() {
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
+
+        return ResAdminStatsDto.builder()
+                .totalMerchant(merchantRepository.count())
+                .totalMerchantAktif(merchantRepository.countByStatus(MerchantEntity.Status.ACTIVE))
+                .totalMerchantNonAktif(merchantRepository.countByStatus(MerchantEntity.Status.INACTIVE))
+                .totalTransaksiHariIni(transactionRepository.countByTransactionDateBetween(startOfDay, endOfDay))
+                .totalBerhasilHariIni(transactionRepository.countByStatusAndTransactionDateBetween(MerchantTransactionEntity.Status.SUCCESS, startOfDay, endOfDay))
+                .totalGagalHariIni(transactionRepository.countByStatusAndTransactionDateBetween(MerchantTransactionEntity.Status.FAILED,startOfDay,endOfDay))
+                .totalTransaksiKeseluruhan(transactionRepository.count())
+                .totalBerhasilKeseluruhan(transactionRepository.countByStatus(MerchantTransactionEntity.Status.SUCCESS))
+                .totalGagalKeseluruhan(transactionRepository.countByStatus(MerchantTransactionEntity.Status.FAILED))
+                .build();
+    }
+
+    @Override
+    public ResMerchantStatsDto getMerchantStats(String userId, String role, UUID merchantId) {
+
+        UUID targetMerchantId;
+
+        if (role.equals("ADMIN")) {
+            if (merchantId == null) {
+                throw new BadRequestException("merchantId wajib diisi");
+            }
+            targetMerchantId = merchantId;
+        } else {
+            MerchantEntity merchant = merchantRepository.findByAccountId(userId)
+                    .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
+            targetMerchantId = merchant.getMerchantId();
+        }
+
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
+
+        return ResMerchantStatsDto.builder()
+                .totalTransaksiHariIni(transactionRepository.countByMerchantIdAndTransactionDateBetween(targetMerchantId, startOfDay, endOfDay))
+                .totalBerhasilHariIni(transactionRepository.countByMerchantIdAndStatusAndTransactionDateBetween(targetMerchantId,MerchantTransactionEntity.Status.SUCCESS, startOfDay, endOfDay))
+                .totalGagalHariIni(transactionRepository.countByMerchantIdAndStatusAndTransactionDateBetween(targetMerchantId, MerchantTransactionEntity.Status.FAILED,startOfDay,endOfDay))
+                .totalTransaksiKeseluruhan(transactionRepository.countByMerchantId(targetMerchantId))
+                .totalBerhasilKeseluruhan(transactionRepository.countByMerchantIdAndStatus(targetMerchantId, MerchantTransactionEntity.Status.SUCCESS))
+                .totalGagalKeseluruhan(transactionRepository.countByMerchantIdAndStatus(targetMerchantId, MerchantTransactionEntity.Status.FAILED))
+                .build();
     }
 }

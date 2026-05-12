@@ -17,7 +17,7 @@ public class GatewayConfig {
                         .uri("lb://auth-service")
                 )
                 .route("merchant-service", r -> r
-                        .path("/gateway/merchants/**", "/gateway/merchant/**", "/gateway/products/**","/gateway/product/**","/gateway/transaction/**" )
+                        .path("/gateway/merchants/**", "/gateway/merchant/**", "/gateway/products/**","/gateway/product/**","/gateway/transaction/**", "/gateway/stats/**" )
                         .filters(f -> f.stripPrefix(1))
                         .uri("lb://merchant-service")
                 )

@@ -42,13 +42,13 @@ public class TransactionController {
         return ResponseEntity.ok(BaseResponse.success("Success", transaction));
     }
 
-    @GetMapping("{productId}")
+    @GetMapping("{transactionId}")
     public ResponseEntity<BaseResponse<?>> getTransactionById(
             @RequestHeader("X-User-Id") String userId,
             @RequestHeader("X-User-Role") String role,
-            @PathVariable UUID productId
+            @PathVariable UUID transactionId
     ){
-        MerchantTransactionEntity transaction = transactionService.getTransactionById(userId, role, productId);
+        MerchantTransactionEntity transaction = transactionService.getTransactionById(userId, role, transactionId);
         return ResponseEntity.ok(BaseResponse.success("Success", transaction));
     }
 

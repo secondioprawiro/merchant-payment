@@ -14,6 +14,7 @@ import com.berijalan.merchant_service.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,10 +24,8 @@ import java.util.UUID;
 @RequestMapping("/merchant")
 @RequiredArgsConstructor
 public class MerchantController {
-
     private final MerchantService merchantService;
-    private final ProductService productService;
-    private final TransactionService transactionService;
+
 
     @PostMapping("/internal/create")
     public ResponseEntity<BaseResponse<Void>> createMerchant(@Valid @RequestBody ReqInternalCreateMerchantDto request) {

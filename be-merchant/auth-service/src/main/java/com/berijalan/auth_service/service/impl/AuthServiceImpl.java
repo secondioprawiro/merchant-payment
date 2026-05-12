@@ -57,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
         ));
 
         log.info("Account registered: email={}, accountId={}", saved.getEmail(), saved.getAccountId());
-        String token = jwtUtil.generateToken(saved.getEmail(), saved.getAccountId().toString());
+        String token = jwtUtil.generateToken(saved.getEmail(), saved.getAccountId().toString(), saved.getRole().toString());
         return new ResponseJwt(saved.getEmail(), token);
     }
 
@@ -75,7 +75,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         log.info("Login success: email={}", authEntity.getEmail());
-        String token = jwtUtil.generateToken(authEntity.getEmail(), authEntity.getAccountId().toString());
+        String token = jwtUtil.generateToken(authEntity.getEmail(), authEntity.getAccountId().toString(), authEntity.getRole().toString());
         return new ResponseJwt(authEntity.getEmail(), token);
     }
 
