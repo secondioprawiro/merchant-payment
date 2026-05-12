@@ -11,6 +11,10 @@
       <p>Selamat datang kembali, masukkan detail akun Anda</p>
     </div>
 
+    @if (error) {
+      <div class="alert-error">{{ error }}</div>
+    }
+
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
 
       <div class="field">
@@ -46,7 +50,9 @@
         }
       </div>
 
-      <button type="submit" class="btn-primary">Masuk</button>
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        @if (isLoading) { Memproses... } @else { Masuk }
+      </button>
 
     </form>
 

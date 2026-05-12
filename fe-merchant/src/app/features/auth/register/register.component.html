@@ -11,18 +11,22 @@
       <p>Daftarkan merchant Anda untuk mulai berjualan</p>
     </div>
 
+    @if (error) {
+      <div class="alert-error">{{ error }}</div>
+    }
+
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
 
       <div class="field">
-        <label for="full_name">Nama Toko</label>
+        <label for="namaMerchant">Nama Toko</label>
         <input
-          id="full_name"
+          id="namaMerchant"
           type="text"
-          formControlName="full_name"
+          formControlName="namaMerchant"
           placeholder="Toko Berkah"
-          [class.invalid]="form.get('full_name')?.invalid && form.get('full_name')?.touched"
+          [class.invalid]="form.get('namaMerchant')?.invalid && form.get('namaMerchant')?.touched"
         />
-        @if (form.get('full_name')?.invalid && form.get('full_name')?.touched) {
+        @if (form.get('namaMerchant')?.invalid && form.get('namaMerchant')?.touched) {
           <span class="error">Nama Toko wajib diisi</span>
         }
       </div>
@@ -60,7 +64,9 @@
         }
       </div>
 
-      <button type="submit" class="btn-primary">Daftar sekarang</button>
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        @if (isLoading) { Memproses... } @else { Daftar sekarang }
+      </button>
 
     </form>
 
