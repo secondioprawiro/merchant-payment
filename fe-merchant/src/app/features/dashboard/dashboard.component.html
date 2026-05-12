@@ -1,3 +1,90 @@
 <div class="page">
   <h1 class="page-title">Dashboard</h1>
+
+  <!-- Stats -->
+  @if (loadingStats) {
+    <div class="stats-loading">
+      <span class="material-icons-round spinning">autorenew</span>
+      Memuat statistik...
+    </div>
+  } @else if (stats) {
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">TOTAL HARI INI</span>
+        <span class="stat-value">{{ stats.totalTransaksiHariIni }}</span>
+        <span class="stat-sub">transaksi</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">BERHASIL</span>
+        <span class="stat-value success">{{ stats.totalBerhasilHariIni }}</span>
+        <span class="stat-sub success">{{ successRate }}% success rate</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">GAGAL</span>
+        <span class="stat-value danger">{{ stats.totalGagalHariIni }}</span>
+        <span class="stat-sub danger">perlu dicek</span>
+      </div>
+    </div>
+  }
+
+  <!-- Transaksi terbaru -->
+  <div class="tx-section">
+    <div class="tx-header">
+      <span class="tx-title">Transaksi terbaru</span>
+      <a class="tx-lihat-semua" routerLink="/riwayat-transaksi">Lihat semua →</a>
+    </div>
+
+    @if (loadingTx) {
+      <div class="stats-loading">
+        <span class="material-icons-round spinning">autorenew</span>
+        Memuat transaksi...
+      </div>
+    } @else if (transactions.length === 0) {
+      <p class="tx-empty">Belum ada transaksi.</p>
+    } @else {
+      <div class="tx-table-wrap">
+        <table class="tx-table">
+          <thead>
+            <tr>
+              <th>ID TRANSAKSI</th>
+              <th>PRODUK</th>
+              <th>NOMOR TUJUAN</th>
+              <th>STATUS</th>
+              <th>WAKTU</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (tx of pagedTransactions; track tx.transactionId) {
+              <tr>
+                <td class="tx-id">{{ tx.refId }}</td>
+                <td class="tx-product">
+                  <span class="tx-dot" [class.dot-pln]="tx.productName.toLowerCase().includes('pln')"></span>
+                  {{ tx.productName }}
+                </td>
+                <td>{{ tx.nomorTujuan }}</td>
+                <td>
+                  <span class="tx-badge" [class.badge-success]="tx.status === 'SUCCESS'" [class.badge-failed]="tx.status === 'FAILED'">
+                    {{ tx.status === 'SUCCESS' ? '✓ SUCCESS' : '✕ FAILED' }}
+                  </span>
+                </td>
+                <td class="tx-time">{{ formatTime(tx.transactionDate) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (totalPages > 1) {
+        <div class="pagination">
+          <button class="page-btn" (click)="prevPage()" [disabled]="page === 0">‹</button>
+          @for (p of [].constructor(totalPages); track $index) {
+            <button class="page-btn" [class.active]="$index === page" (click)="page = $index">
+              {{ $index + 1 }}
+            </button>
+          }
+          <button class="page-btn" (click)="nextPage()" [disabled]="page === totalPages - 1">›</button>
+        </div>
+      }
+    }
+  </div>
 </div>
