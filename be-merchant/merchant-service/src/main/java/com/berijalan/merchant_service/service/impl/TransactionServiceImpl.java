@@ -9,6 +9,7 @@ import com.berijalan.merchant_service.entity.MerchantEntity;
 import com.berijalan.merchant_service.entity.MerchantTransactionEntity;
 import com.berijalan.merchant_service.exception.BadRequestException;
 import com.berijalan.merchant_service.exception.DataNotFoundException;
+import com.berijalan.merchant_service.exception.ForbiddenException;
 import com.berijalan.merchant_service.repository.MerchantRepository;
 import com.berijalan.merchant_service.repository.MerchantTransactionRepository;
 import com.berijalan.merchant_service.service.TransactionService;
@@ -64,8 +65,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
         ResTransactionDto productResponse = productClient.processTransaction(request).getData();
 
-        System.out.println("Full response: " + productResponse);
-        System.out.println("Data: " + productResponse.getStatus());
+        log.info("Transaction response: status={}, refId={}", productResponse.getStatus(), productResponse.getRefId());
 
 
         MerchantTransactionEntity transaction = new MerchantTransactionEntity();
@@ -102,7 +102,7 @@ public class TransactionServiceImpl implements TransactionService {
             MerchantEntity merchant = merchantRepository.findByAccountId(userId)
                     .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
             if (!transaction.getMerchantId().toString().equals((merchant.getMerchantId().toString()))){
-                throw new BadRequestException("Tidak memiliki akses ke transaksi ini");
+                throw new ForbiddenException("Tidak memiliki akses ke transaksi ini");
             }
         }
         return transaction;

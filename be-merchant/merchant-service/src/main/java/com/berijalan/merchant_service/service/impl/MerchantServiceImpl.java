@@ -49,9 +49,13 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public ResDetailMerchantDto getDetailMerchant(UUID merchantId) {
+    public ResDetailMerchantDto getDetailMerchant(UUID merchantId, String userId, String role) {
         MerchantEntity merchant = merchantRepository.findByMerchantIdAndIsDeletedFalse(merchantId)
                 .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
+
+        if (!"ADMIN".equals(role) && !merchant.getAccountId().equals(userId)) {
+            throw new ForbiddenException("Access denied");
+        }
 
         ResInternalAccountDto account = authFeignClient
                 .getAccountById(UUID.fromString(merchant.getAccountId()))

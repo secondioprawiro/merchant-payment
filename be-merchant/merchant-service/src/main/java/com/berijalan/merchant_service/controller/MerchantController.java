@@ -47,8 +47,9 @@ public class MerchantController {
     @GetMapping("/{merchantId}")
     public ResponseEntity<BaseResponse<ResDetailMerchantDto>> getDetailMerchant(
             @PathVariable UUID merchantId,
+            @RequestHeader("X-User-Id") String userId,
             @RequestHeader("X-User-Role") String role) {
-        ResDetailMerchantDto detail = merchantService.getDetailMerchant(merchantId);
+        ResDetailMerchantDto detail = merchantService.getDetailMerchant(merchantId, userId, role);
         return ResponseEntity.ok(BaseResponse.success("Success", detail));
     }
 

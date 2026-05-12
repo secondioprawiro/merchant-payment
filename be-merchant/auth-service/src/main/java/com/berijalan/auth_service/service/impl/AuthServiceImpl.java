@@ -62,10 +62,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseJwt login(ReqLoginDto reqLoginDto) {
         AuthEntity authEntity = authRepository.findByEmail(reqLoginDto.getEmail())
-                .orElseThrow(() -> new DataNotFoundException("Email tidak ditemukan"));
+                .orElseThrow(() -> new BadRequestException("Email atau password salah"));
 
         if (!passwordEncoder.matches(reqLoginDto.getPassword(), authEntity.getPassword())) {
-            throw new BadRequestException("Password salah");
+            throw new BadRequestException("Email atau password salah");
         }
 
         String token = jwtUtil.generateToken(authEntity.getEmail(), authEntity.getAccountId().toString());

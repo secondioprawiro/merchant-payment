@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface MerchantService {
     void createMerchant(ReqInternalCreateMerchantDto request);
     List<ResMerchantDto> getAllMerchants();
-    ResDetailMerchantDto getDetailMerchant(UUID merchantId);
+    ResDetailMerchantDto getDetailMerchant(UUID merchantId, String userId, String role);
     ResDetailMerchantDto updateMerchant(UUID merchantId, ReqUpdateMerchantDto request, String userId, String role);
     void deleteMerchant(UUID merchantId, String userId, String role);
 }
