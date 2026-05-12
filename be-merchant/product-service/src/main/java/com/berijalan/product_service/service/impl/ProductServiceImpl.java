@@ -54,6 +54,7 @@ public class ProductServiceImpl implements ProductService {
         boolean isSuccess = Math.random() > 0.3;
 
         if(isSuccess){
+            log.info("Transaction processed: productId={}, nomorTujuan={}, status=SUCCESS", request.getProductId(), request.getNomorTujuan());
             return ResTransactionDto.builder()
                     .refId("REF" + System.currentTimeMillis())
                     .productId(request.getProductId())
@@ -71,6 +72,7 @@ public class ProductServiceImpl implements ProductService {
                     "Timeout dari provider"
             );
             String randomReason = reasons.get((int)(Math.random()* reasons.size()));
+            log.warn("Transaction processed: productId={}, nomorTujuan={}, status=FAILED, reason={}", request.getProductId(), request.getNomorTujuan(), randomReason);
             return ResTransactionDto.builder()
                     .refId("REF" + System.currentTimeMillis())
                     .productId(request.getProductId())
