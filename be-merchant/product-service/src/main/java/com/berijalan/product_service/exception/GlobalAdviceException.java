@@ -27,6 +27,13 @@ public class GlobalAdviceException {
                 .body(BaseResponse.failed(exception.getMessage()));
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<BaseResponse<?>> handleUnauthorized(UnauthorizedException exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(BaseResponse.failed(exception.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse<Object>>handleMethodArgumentNotValid(MethodArgumentNotValidException exception){
         ArrayList<String> errorMessage = new ArrayList<>();
@@ -38,5 +45,12 @@ public class GlobalAdviceException {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(BaseResponse.failed("Data tidak valid", errorMessage));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<BaseResponse<?>> handleGeneral(Exception exception) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(BaseResponse.failed("Terjadi kesalahan pada server"));
     }
 }

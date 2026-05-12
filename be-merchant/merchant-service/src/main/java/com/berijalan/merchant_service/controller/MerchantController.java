@@ -29,7 +29,7 @@ public class MerchantController {
     private final TransactionService transactionService;
 
     @PostMapping("/internal/create")
-    public ResponseEntity<BaseResponse<Void>> createMerchant(@RequestBody ReqInternalCreateMerchantDto request) {
+    public ResponseEntity<BaseResponse<Void>> createMerchant(@Valid @RequestBody ReqInternalCreateMerchantDto request) {
         merchantService.createMerchant(request);
         return ResponseEntity.ok(BaseResponse.success("Merchant created", null));
     }
@@ -55,7 +55,7 @@ public class MerchantController {
     @PutMapping("/{merchantId}")
     public ResponseEntity<BaseResponse<ResDetailMerchantDto>> updateMerchant(
             @PathVariable UUID merchantId,
-            @RequestBody ReqUpdateMerchantDto request,
+            @Valid @RequestBody ReqUpdateMerchantDto request,
             @RequestHeader("X-User-Id") String userId,
             @RequestHeader("X-User-Role") String role) {
         ResDetailMerchantDto updated = merchantService.updateMerchant(merchantId, request, userId, role);

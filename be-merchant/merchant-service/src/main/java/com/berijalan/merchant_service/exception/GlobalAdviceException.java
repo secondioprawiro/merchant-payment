@@ -48,6 +48,13 @@ public class GlobalAdviceException {
                 .body(BaseResponse.failed("Data tidak valid", errorMessage));
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<BaseResponse<?>> handleUnauthorized(UnauthorizedException exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(BaseResponse.failed(exception.getMessage()));
+    }
+
     @ExceptionHandler(FeignException.NotFound.class)
     public ResponseEntity<BaseResponse<?>> handleFeignNotFound(FeignException.NotFound e) {
         return ResponseEntity
@@ -60,5 +67,12 @@ public class GlobalAdviceException {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(BaseResponse.failed("Gagal menghubungi service"));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<BaseResponse<?>> handleGeneral(Exception exception) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(BaseResponse.failed("Terjadi kesalahan pada server"));
     }
 }
