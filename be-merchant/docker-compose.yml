@@ -14,8 +14,19 @@
     redis:
       image: redis:7
       container_name: berijalan-redis
+      restart: always
       ports:
         - "6379:6379"
+      command: redis-server --save 60 1 --loglevel warning
+
+    redis-insight:
+      image: redis/redisinsight:latest
+      container_name: redis-insight-merchant
+      restart: always
+      ports:
+        - "5540:5540"
+      depends_on:
+        - redis
 
   volumes:
     berijalan-db-data:
