@@ -41,6 +41,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public ResponseJwt register(ReqCreateAccDto reqCreateAccDto) {
         if (authRepository.existsByEmail(reqCreateAccDto.getEmail())) {
+            log.warn("Register failed - email already exists: {}", reqCreateAccDto.getEmail());
             throw new BadRequestException("Email already exists");
         }
 
@@ -55,6 +56,7 @@ public class AuthServiceImpl implements AuthService {
                 reqCreateAccDto.getNamaMerchant()
         ));
 
+        log.info("Account registered: email={}, accountId={}", saved.getEmail(), saved.getAccountId());
         String token = jwtUtil.generateToken(saved.getEmail(), saved.getAccountId().toString());
         return new ResponseJwt(saved.getEmail(), token);
     }
@@ -62,12 +64,17 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseJwt login(ReqLoginDto reqLoginDto) {
         AuthEntity authEntity = authRepository.findByEmail(reqLoginDto.getEmail())
-                .orElseThrow(() -> new DataNotFoundException("Email tidak ditemukan"));
+                .orElseThrow(() -> {
+                    log.warn("Login failed - invalid credentials for email: {}", reqLoginDto.getEmail());
+                    return new BadRequestException("Email atau password salah");
+                });
 
         if (!passwordEncoder.matches(reqLoginDto.getPassword(), authEntity.getPassword())) {
-            throw new BadRequestException("Password salah");
+            log.warn("Login failed - invalid credentials for email: {}", reqLoginDto.getEmail());
+            throw new BadRequestException("Email atau password salah");
         }
 
+        log.info("Login success: email={}", authEntity.getEmail());
         String token = jwtUtil.generateToken(authEntity.getEmail(), authEntity.getAccountId().toString());
         return new ResponseJwt(authEntity.getEmail(), token);
     }
@@ -86,6 +93,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (request.getEmail() != null && !request.getEmail().equals(authEntity.getEmail())) {
             if (authRepository.existsByEmailAndAccountIdNot(request.getEmail(), accountId)) {
+                log.warn("Update failed - email already used: {}", request.getEmail());
                 throw new BadRequestException("Email sudah digunakan");
             }
             authEntity.setEmail(request.getEmail());
@@ -96,6 +104,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         AuthEntity saved = authRepository.save(authEntity);
+        log.info("Account updated: accountId={}", accountId);
         return new ResInternalAccountDto(saved.getEmail());
     }
 }

@@ -13,6 +13,7 @@ import com.berijalan.merchant_service.exception.ForbiddenException;
 import com.berijalan.merchant_service.repository.MerchantRepository;
 import com.berijalan.merchant_service.service.MerchantService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MerchantServiceImpl implements MerchantService {
@@ -39,6 +41,7 @@ public class MerchantServiceImpl implements MerchantService {
                 .build();
 
         merchantRepository.save(merchant);
+        log.info("Merchant created: kodeMerchant={}, accountId={}", kodeMerchant, request.getAccountId());
     }
 
     @Override
@@ -49,9 +52,14 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public ResDetailMerchantDto getDetailMerchant(UUID merchantId) {
+    public ResDetailMerchantDto getDetailMerchant(UUID merchantId, String userId, String role) {
         MerchantEntity merchant = merchantRepository.findByMerchantIdAndIsDeletedFalse(merchantId)
                 .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
+
+        if (!"ADMIN".equals(role) && !merchant.getAccountId().equals(userId)) {
+            log.warn("Access denied - userId={} tried to access merchantId={}", userId, merchantId);
+            throw new ForbiddenException("Access denied");
+        }
 
         ResInternalAccountDto account = authFeignClient
                 .getAccountById(UUID.fromString(merchant.getAccountId()))
@@ -66,6 +74,7 @@ public class MerchantServiceImpl implements MerchantService {
                 .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
 
         if (!"ADMIN".equals(role) && !merchant.getAccountId().equals(userId)) {
+            log.warn("Access denied - userId={} tried to update merchantId={}", userId, merchantId);
             throw new ForbiddenException("Access denied");
         }
 
@@ -79,6 +88,7 @@ public class MerchantServiceImpl implements MerchantService {
                 .updateAccount(UUID.fromString(merchant.getAccountId()), accountDto)
                 .getData();
 
+        log.info("Merchant updated: merchantId={}", merchantId);
         return new ResDetailMerchantDto(merchant.getNamaMerchant(), updatedAccount.getEmail());
     }
 
@@ -88,6 +98,7 @@ public class MerchantServiceImpl implements MerchantService {
                 .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
 
         if (!"ADMIN".equals(role) && !merchant.getAccountId().equals(userId)) {
+            log.warn("Access denied - userId={} tried to delete merchantId={}", userId, merchantId);
             throw new ForbiddenException("Access denied");
         }
 
@@ -95,6 +106,7 @@ public class MerchantServiceImpl implements MerchantService {
         merchant.setStatus(MerchantEntity.Status.INACTIVE);
         merchant.setDeletedAt(LocalDateTime.now());
         merchantRepository.save(merchant);
+        log.info("Merchant deleted: merchantId={}", merchantId);
     }
 
     private String generateKodeMerchant() {

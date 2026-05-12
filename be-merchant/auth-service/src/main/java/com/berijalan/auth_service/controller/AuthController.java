@@ -50,7 +50,7 @@ public class AuthController {
     @PutMapping("/internal/account/{accountId}")
     public ResponseEntity<BaseResponse<ResInternalAccountDto>> updateAccount(
             @PathVariable UUID accountId,
-            @RequestBody ReqUpdateAccountDto request) {
+            @Valid @RequestBody ReqUpdateAccountDto request) {
         ResInternalAccountDto data = authService.updateAccount(accountId, request);
         return ResponseEntity.ok(BaseResponse.success("Account updated", data));
     }

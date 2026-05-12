@@ -9,6 +9,7 @@ import com.berijalan.merchant_service.entity.MerchantEntity;
 import com.berijalan.merchant_service.entity.MerchantTransactionEntity;
 import com.berijalan.merchant_service.exception.BadRequestException;
 import com.berijalan.merchant_service.exception.DataNotFoundException;
+import com.berijalan.merchant_service.exception.ForbiddenException;
 import com.berijalan.merchant_service.repository.MerchantRepository;
 import com.berijalan.merchant_service.repository.MerchantTransactionRepository;
 import com.berijalan.merchant_service.service.TransactionService;
@@ -33,8 +34,12 @@ public class TransactionServiceImpl implements TransactionService {
     public MerchantTransactionEntity buyProduct(String userId, ReqTransactionDto request) {
         // 1. Validasi merchant
         MerchantEntity merchant = merchantRepository.findByAccountId(userId)
-                .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
+                .orElseThrow(() -> {
+                    log.warn("Transaction rejected - merchant not found for userId={}", userId);
+                    return new DataNotFoundException("Merchant tidak ditemukan");
+                });
         if (!merchant.getStatus().equals(MerchantEntity.Status.ACTIVE)) {
+            log.warn("Transaction rejected - merchant inactive: merchantId={}", merchant.getMerchantId());
             throw new BadRequestException("Merchant tidak aktif");
         }
 
@@ -42,12 +47,15 @@ public class TransactionServiceImpl implements TransactionService {
         try {
             productData = productClient.getProductById(request.getProductId());
         } catch (FeignException.NotFound e) {
+            log.warn("Transaction rejected - product not found: productId={}", request.getProductId());
             throw new DataNotFoundException("Produk tidak ditemukan");
         } catch (FeignException e) {
+            log.error("Failed to call product-service for productId={}: {}", request.getProductId(), e.getMessage());
             throw new BadRequestException("Gagal menghubungi product service");
         }
 
         if (!productData.getData().getStatus().equals("AVAILABLE")) {
+            log.warn("Transaction rejected - product not available: productId={}", request.getProductId());
             throw new BadRequestException("Produk tidak tersedia");
         }
 
@@ -55,18 +63,16 @@ public class TransactionServiceImpl implements TransactionService {
         String type = productData.getData().getType();
         if (type.equals("PULSA")) {
             if (!request.getNomorTujuan().matches("^[0-9]{10,13}$")) {
+                log.warn("Transaction rejected - invalid nomorTujuan format: type=PULSA, nomorTujuan={}", request.getNomorTujuan());
                 throw new BadRequestException("Nomor HP tidak valid");
             }
         } else if (type.equals("PLN")) {
             if (!request.getNomorTujuan().matches("^[0-9]{11,12}$")) {
+                log.warn("Transaction rejected - invalid nomorTujuan format: type=PLN, nomorTujuan={}", request.getNomorTujuan());
                 throw new BadRequestException("Nomor meter PLN tidak valid");
             }
         }
         ResTransactionDto productResponse = productClient.processTransaction(request).getData();
-
-        System.out.println("Full response: " + productResponse);
-        System.out.println("Data: " + productResponse.getStatus());
-
 
         MerchantTransactionEntity transaction = new MerchantTransactionEntity();
         transaction.setMerchantId(merchant.getMerchantId());
@@ -79,7 +85,9 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setFailureReason(productResponse.getFailureReason());
         transaction.setTransactionDate(LocalDateTime.now());
 
-        return transactionRepository.save(transaction);
+        MerchantTransactionEntity saved = transactionRepository.save(transaction);
+        log.info("Transaction saved: transactionId={}, refId={}, status={}", saved.getTransactionId(), saved.getRefId(), saved.getStatus());
+        return saved;
     }
 
     @Override
@@ -102,7 +110,8 @@ public class TransactionServiceImpl implements TransactionService {
             MerchantEntity merchant = merchantRepository.findByAccountId(userId)
                     .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
             if (!transaction.getMerchantId().toString().equals((merchant.getMerchantId().toString()))){
-                throw new BadRequestException("Tidak memiliki akses ke transaksi ini");
+                log.warn("Access denied - userId={} tried to access transactionId={}", userId, transactionId);
+                throw new ForbiddenException("Tidak memiliki akses ke transaksi ini");
             }
         }
         return transaction;
