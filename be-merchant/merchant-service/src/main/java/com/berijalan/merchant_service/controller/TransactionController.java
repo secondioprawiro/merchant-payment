@@ -9,8 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 import java.util.UUID;
 
@@ -40,10 +43,12 @@ public class TransactionController {
             @RequestHeader("X-User-Id") String userId,
             @RequestHeader("X-User-Role") String role,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ){
         Page<MerchantTransactionEntity> transactions = transactionService.getAllTransactions(
-                userId, role, PageRequest.of(page, size, Sort.by("transactionDate").descending()));
+                userId, role, PageRequest.of(page, size, Sort.by("transactionDate").descending()), startDate, endDate);
         return ResponseEntity.ok(BaseResponse.success("Success", transactions));
     }
 

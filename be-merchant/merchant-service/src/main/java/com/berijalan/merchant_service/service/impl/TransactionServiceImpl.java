@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
@@ -98,14 +99,22 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<MerchantTransactionEntity> getAllTransactions(String userId, String role, Pageable pageable) {
+    public Page<MerchantTransactionEntity> getAllTransactions(String userId, String role, Pageable pageable, LocalDate startDate, LocalDate endDate) {
         Page<MerchantTransactionEntity> transactions;
+        boolean hasDateFilter = startDate != null && endDate != null;
+        LocalDateTime start = hasDateFilter ? startDate.atStartOfDay() : null;
+        LocalDateTime end = hasDateFilter ? endDate.atTime(LocalTime.MAX) : null;
+
         if (role.equals("ADMIN")) {
-            transactions = transactionRepository.findAll(pageable);
+            transactions = hasDateFilter
+                    ? transactionRepository.findAllByTransactionDateBetween(start, end, pageable)
+                    : transactionRepository.findAll(pageable);
         } else {
             MerchantEntity merchant = merchantRepository.findByAccountId(userId)
                     .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
-            transactions = transactionRepository.findByMerchantId(merchant.getMerchantId(), pageable);
+            transactions = hasDateFilter
+                    ? transactionRepository.findByMerchantIdAndTransactionDateBetween(merchant.getMerchantId(), start, end, pageable)
+                    : transactionRepository.findByMerchantId(merchant.getMerchantId(), pageable);
         }
 
         Set<UUID> merchantIds = transactions.stream()

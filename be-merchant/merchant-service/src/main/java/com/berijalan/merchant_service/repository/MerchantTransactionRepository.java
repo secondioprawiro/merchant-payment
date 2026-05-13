@@ -12,6 +12,8 @@ import java.util.UUID;
 public interface MerchantTransactionRepository extends JpaRepository<MerchantTransactionEntity, UUID> {
     Page<MerchantTransactionEntity> findAll(Pageable pageable);
     Page<MerchantTransactionEntity> findByMerchantId(UUID merchantId, Pageable pageable);
+    Page<MerchantTransactionEntity> findAllByTransactionDateBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
+    Page<MerchantTransactionEntity> findByMerchantIdAndTransactionDateBetween(UUID merchantId, LocalDateTime start, LocalDateTime end, Pageable pageable);
     Optional<MerchantTransactionEntity> findByTransactionId(UUID transactionId);
     long countByTransactionDateBetween(LocalDateTime start, LocalDateTime end);
     long countByStatusAndTransactionDateBetween(MerchantTransactionEntity.Status status, LocalDateTime start, LocalDateTime end);

@@ -494,7 +494,7 @@ Authorization: Bearer <token>
 ---
 
 ### GET /gateway/transaction
-Ambil semua transaksi.  
+Ambil semua transaksi dengan pagination dan filter tanggal opsional.  
 **Auth:** Required  
 **Role:** ADMIN (semua transaksi) | USER (transaksi merchant sendiri)
 
@@ -503,24 +503,41 @@ Ambil semua transaksi.
 Authorization: Bearer <token>
 ```
 
+**Query Parameters:**
+| Parameter | Tipe | Default | Keterangan |
+|-----------|------|---------|------------|
+| page | int | 0 | Halaman ke-n (0-based) |
+| size | int | 20 | Jumlah item per halaman |
+| startDate | LocalDate | - | Filter awal tanggal (format: `YYYY-MM-DD`) |
+| endDate | LocalDate | - | Filter akhir tanggal (format: `YYYY-MM-DD`) |
+
+> `startDate` dan `endDate` harus diisi keduanya atau tidak sama sekali.
+
 **Response 200 OK:**
 ```json
 {
   "message": "Success",
-  "data": [
-    {
-      "transactionId": "550e8400-e29b-41d4-a716-446655440000",
-      "merchantId": "...",
-      "refId": "REF1715500000000",
-      "productId": "PULSA_10K",
-      "productName": "PULSA 10.000",
-      "nomorTujuan": "08123456789",
-      "amount": 11000,
-      "status": "SUCCESS",
-      "failureReason": null,
-      "transactionDate": "2026-05-12T10:00:00"
-    }
-  ]
+  "data": {
+    "content": [
+      {
+        "transactionId": "550e8400-e29b-41d4-a716-446655440000",
+        "merchantId": "...",
+        "namaMerchant": "Toko A",
+        "refId": "REF1715500000000",
+        "productId": "PULSA_10K",
+        "productName": "PULSA 10.000",
+        "nomorTujuan": "08123456789",
+        "amount": 11000,
+        "status": "SUCCESS",
+        "failureReason": null,
+        "transactionDate": "2026-05-12T10:00:00"
+      }
+    ],
+    "totalElements": 100,
+    "totalPages": 5,
+    "size": 20,
+    "number": 0
+  }
 }
 ```
 
