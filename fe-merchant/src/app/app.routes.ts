@@ -19,6 +19,11 @@ export const routes: Routes = [
           import('./features/profil/profil/profil.component').then(m => m.ProfilComponent),
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'beli-produk',
+        loadComponent: () =>
+          import('./features/products/buy/buy.component').then(m => m.BuyComponent),
+      }
     ],
   },
   {

@@ -1,0 +1,75 @@
+<div class="page-header">
+  <h2>Beli Produk</h2>
+  <p>Pilih produk, masukkan nomor tujuan, lalu proses transaksi</p>
+</div>
+
+<div class="content-grid">
+  <div class="card">
+    <h3>Pilih jenis produk</h3>
+
+    <div class="tab-group">
+      <button [class.active]="selectedType === 'PULSA'" (click)="selectType('PULSA')">
+        Pulsa
+      </button>
+      <button [class.active]="selectedType === 'PLN'" (click)="selectType('PLN')">
+        Token PLN
+      </button>
+    </div>
+
+    <!-- Grid produk -->
+    <p class="section-label">Pilih nominal</p>
+    <div class="product-grid">
+      <div
+        *ngFor="let product of filteredProducts"
+        class="product-card"
+        [class.selected]="selectedProduct?.productId === product.productId"
+        (click)="selectProduct(product)">
+        <span class="product-nominal">{{ product.nominal | number }}</span>
+        <span class="harga-text">Harga</span>
+        <span class="product-price">Rp {{ product.price | number }}</span>
+      </div>
+    </div>
+
+    <!-- Input nomor tujuan -->
+    <div class="form-group">
+      <label>{{ selectedType === 'PULSA' ? 'Nomor HP tujuan' : 'Nomor meter / ID pelanggan' }}</label>
+      <input
+        type="text"
+        inputmode="numeric"
+        [(ngModel)]="nomorTujuan"
+        (input)="onInputNomor($event)"
+        [placeholder]="selectedType === 'PULSA' ? '08xx-xxxx-xxxx' : '12 digit nomor meter'" />
+      <small>{{ selectedType === 'PULSA' ? 'Masukkan nomor HP yang aktif' : 'Cek nomor meter di struk tagihan PLN' }}</small>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Ringkasan transaksi</h3>
+    <div class="summary">
+      <div class="summary-row">
+        <span>Merchant</span>
+        <span>{{ merchantName }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Produk</span>
+        <span>{{ selectedProduct?.productName ?? '—' }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Nomor tujuan</span>
+        <span>{{ nomorTujuan || '—' }}</span>
+      </div>
+      <div class="summary-row total">
+        <span>Total</span>
+        <span class="green">Rp {{ selectedProduct?.price ?? 0 | number }}</span>
+      </div>
+    </div>
+
+    <button
+      class="btn-primary"
+      [disabled]="!selectedProduct || !nomorTujuan"
+      (click)="prosesTransaksi()">
+      Proses transaksi
+    </button>
+    <p class="hint">Transaksi diproses secara otomatis</p>
+  </div>
+</div>
