@@ -57,6 +57,21 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  getRole(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload['role'] ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  isAdmin(): boolean {
+    return this.getRole() === 'ADMIN';
+  }
+
   private saveToken(token: string): void {
     if (!isPlatformBrowser(this.platformId)) return;
     localStorage.setItem(this.TOKEN_KEY, token);

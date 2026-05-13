@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { ShellComponent } from './core/layout/shell/shell.component';
 import { authGuard } from './core/auth/auth.guard';
+import { adminGuard } from './core/auth/admin.guard';
 
 export const routes: Routes = [
   {
@@ -22,6 +23,12 @@ export const routes: Routes = [
         path: 'riwayat-transaksi',
         loadComponent: () =>
           import('./features/riwayat-transaksi/riwayat-transaksi.component').then(m => m.RiwayatTransaksiComponent),
+      },
+      {
+        path: 'admin',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/admin/merchant-list/merchant-list.component').then(m => m.MerchantListComponent),
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {

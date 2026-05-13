@@ -39,7 +39,7 @@
         <span class="material-icons-round spinning">autorenew</span>
         Memuat transaksi...
       </div>
-    } @else if (transactions.length === 0) {
+    } @else if (pagedTransactions.length === 0) {
       <p class="tx-empty">Belum ada transaksi.</p>
     } @else {
       <div class="tx-table-wrap">
@@ -78,7 +78,7 @@
         <div class="pagination">
           <button class="page-btn" (click)="prevPage()" [disabled]="page === 0">‹</button>
           @for (p of [].constructor(totalPages); track $index) {
-            <button class="page-btn" [class.active]="$index === page" (click)="page = $index">
+            <button class="page-btn" [class.active]="$index === page" (click)="goToPage($index)">
               {{ $index + 1 }}
             </button>
           }

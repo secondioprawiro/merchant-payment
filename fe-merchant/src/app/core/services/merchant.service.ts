@@ -14,6 +14,9 @@ export interface MerchantStats {
   totalTransaksiHariIni: number;
   totalBerhasilHariIni: number;
   totalGagalHariIni: number;
+  totalTransaksiKeseluruhan: number;
+  totalBerhasilKeseluruhan: number;
+  totalGagalKeseluruhan: number;
 }
 
 export interface Transaction {
@@ -25,6 +28,30 @@ export interface Transaction {
   status: 'SUCCESS' | 'FAILED';
   failureReason: string | null;
   transactionDate: string;
+  namaMerchant: string | null;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}
+
+export interface AdminStats {
+  totalMerchant: number;
+  totalMerchantAktif: number;
+  totalMerchantNonAktif: number;
+}
+
+export interface MerchantListItem {
+  merchantId: string;
+  kodeMerchant: string;
+  namaMerchant: string;
+  status: string;
 }
 
 export interface UpdateProfileRequest {
@@ -49,9 +76,9 @@ export class MerchantService {
       .pipe(map(res => res.data));
   }
 
-  getTransactions(): Observable<Transaction[]> {
+  getTransactions(page = 0, size = 20): Observable<PageResponse<Transaction>> {
     return this.http
-      .get<ApiResponse<Transaction[]>>('/gateway/transaction')
+      .get<ApiResponse<PageResponse<Transaction>>>(`/gateway/transaction?page=${page}&size=${size}`)
       .pipe(map(res => res.data));
   }
 
@@ -61,9 +88,27 @@ export class MerchantService {
       .pipe(map(res => res.data));
   }
 
+  getAdminStats(): Observable<AdminStats> {
+    return this.http
+      .get<ApiResponse<AdminStats>>('/gateway/stats/admin')
+      .pipe(map(res => res.data));
+  }
+
+  getAllMerchants(): Observable<MerchantListItem[]> {
+    return this.http
+      .get<ApiResponse<MerchantListItem[]>>(this.BASE)
+      .pipe(map(res => res.data));
+  }
+
   updateProfile(merchantId: string, req: UpdateProfileRequest): Observable<MerchantProfile> {
     return this.http
       .put<ApiResponse<MerchantProfile>>(`${this.BASE}/${merchantId}`, req)
       .pipe(map(res => res.data));
+  }
+
+  deleteMerchant(merchantId: string): Observable<void> {
+    return this.http
+      .delete<ApiResponse<void>>(`${this.BASE}/${merchantId}`)
+      .pipe(map(() => void 0));
   }
 }
