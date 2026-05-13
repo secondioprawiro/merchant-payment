@@ -72,4 +72,12 @@
     </button>
     <p class="hint">Transaksi diproses secara otomatis</p>
   </div>
+
+  <app-transaction-detail
+    [detail]="transactionDetail"
+    [showModal]="showModal"
+    (onClose)="closeModal()"
+    (onTransaksiBaru)="transaksiBaru()">
+  </app-transaction-detail>
+
 </div>

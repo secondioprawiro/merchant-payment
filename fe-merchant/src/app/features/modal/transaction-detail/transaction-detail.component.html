@@ -1,0 +1,65 @@
+<div class="modal-overlay" *ngIf="showModal" (click)="close()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <button (click)="close()">← Kembali</button>
+      <span>Hasil transaksi</span>
+    </div>
+
+    <div class="status-box">
+      <div class="status-icon" [class.success]="detail?.status === 'SUCCESS'"
+           [class.failed]="detail?.status === 'FAILED'">
+        <span *ngIf="detail?.status === 'SUCCESS'">✓</span>
+        <span *ngIf="detail?.status === 'FAILED'">✗</span>
+      </div>
+
+      <h2 [class.green]="detail?.status === 'SUCCESS'"
+          [class.red]="detail?.status === 'FAILED'">
+        {{ detail?.status === 'SUCCESS' ? 'Transaksi berhasil' : 'Transaksi gagal' }}
+      </h2>
+      <p>{{ detail?.status === 'SUCCESS' ? 'Pulsa berhasil dikirim ke nomor tujuan' : 'Gagal diproses oleh external system' }}</p>
+      <span class="badge" [class.badge-success]="detail?.status === 'SUCCESS'"
+            [class.badge-failed]="detail?.status === 'FAILED'">
+        {{ detail?.status }}
+      </span>
+    </div>
+
+    <div class="detail-card">
+      <h4>Detail transaksi</h4>
+      <div class="detail-row">
+        <span>ID transaksi</span>
+        <span>{{ detail?.transactionId }}</span>
+      </div>
+      <div class="detail-row">
+        <span>Produk</span>
+        <strong>{{ detail?.amount | number }}</strong>
+      </div>
+      <div class="detail-row">
+        <span>Nomor tujuan</span>
+        <span>{{ detail?.nomorTujuan }}</span>
+      </div>
+      <div class="detail-row">
+        <span>Tanggal</span>
+        <span>{{ detail?.transactionDate | date:'dd MMM yyyy, HH:mm' }}</span>
+      </div>
+      <div class="detail-row">
+        <span>Status</span>
+        <span class="badge" [class.badge-success]="detail?.status === 'SUCCESS'"
+              [class.badge-failed]="detail?.status === 'FAILED'">
+          {{ detail?.status }}
+        </span>
+      </div>
+      <div class="detail-row" *ngIf="detail?.status === 'FAILED'">
+        <span>Alasan gagal</span>
+        <span class="red">{{ detail?.failureReason }}</span>
+      </div>
+    </div>
+
+    <button class="btn-outline" *ngIf="detail?.status === 'FAILED'"
+            (click)="transaksiBaru()">
+      ↺ Coba lagi
+    </button>
+    <button class="btn-outline" (click)="transaksiBaru()">⚡ Transaksi baru</button>
+    <button class="btn-outline" routerLink="/dashboard">⊞ Ke dashboard</button>
+  </div>
+</div>

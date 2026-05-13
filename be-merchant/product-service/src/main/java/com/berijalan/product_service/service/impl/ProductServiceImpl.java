@@ -20,7 +20,7 @@ public class ProductServiceImpl implements ProductService {
     private final List<Product> products = List.of(
             new Product("PULSA_10K", "PULSA 10.000",10000L, 11000L, "PULSA", "AVAILABLE"),
             new Product("PULSA_25K", "PULSA 25.000",25000L, 26000L, "PULSA",  "AVAILABLE"),
-            new Product("PULSA_50K", "PULSA 50.000",50000L, 11000L, "PULSA", "AVAILABLE"),
+            new Product("PULSA_50K", "PULSA 50.000",50000L, 51000L, "PULSA", "AVAILABLE"),
             new Product("PULSA_100K",  "PULSA 100.000", 100000L, 101000L, "PULSA", "AVAILABLE"),
             new Product("TOKEN_PLN_20K", "TOKEN PLN 20.000", 20000L, 21500L, "PLN", "AVAILABLE"),
             new Product("TOKEN_PLN_50K", "TOKEN PLN 50.000", 50000L, 51500L, "PLN", "AVAILABLE"),

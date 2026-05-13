@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject  } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf, DecimalPipe } from '@angular/common';
 import { ProductService } from '../../../core/services/product.service';
-
-// import { TransactionService } from '../../services/transaction.service';
+import {MerchantService} from '../../../core/services/merchant.service';
+import {TransactionService} from '../../../core/services/transaction.service';
+import {TransactionDetailComponent } from '../../modal/transaction-detail/transaction-detail.component';
 
 interface Product {
   productId: string;
@@ -19,7 +20,7 @@ interface Product {
 @Component({
   selector: 'app-buy',
   standalone: true,
-  imports: [NgFor, NgIf, DecimalPipe, FormsModule],
+  imports: [NgFor, NgIf, DecimalPipe, FormsModule, TransactionDetailComponent],
   templateUrl: './buy.component.html',
   styleUrls: ['./buy.component.css']
 })
@@ -27,9 +28,11 @@ export class BuyComponent implements OnInit {
   selectedType: 'PULSA' | 'PLN' = 'PULSA';
   selectedProduct: Product | null = null;
   nomorTujuan: string = '';
-  merchantName: string = 'Toko Berkah';
-
+  merchantName: string = '';
   products: Product[] = [];
+  showModal: boolean = false;
+  transactionDetail: any = null;
+  isLoading: boolean = false;
 
   get filteredProducts(): Product[] {
     return this.products.filter(p => p.type === this.selectedType);
@@ -37,7 +40,8 @@ export class BuyComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    // private transactionService: TransactionService,
+    private merchantService : MerchantService,
+    private transactionService: TransactionService,
     private router: Router
   ) {}
 
@@ -46,6 +50,10 @@ export class BuyComponent implements OnInit {
       this.products = data;
       this.selectedProduct = this.filteredProducts[0] ?? null;
     });
+    this.merchantService.getProfile().subscribe(res => {
+      this.merchantName = res.namaMerchant;
+      }
+    )
   }
 
   selectType(type: 'PULSA' | 'PLN'): void {
@@ -60,24 +68,25 @@ export class BuyComponent implements OnInit {
 
   prosesTransaksi(): void {
     if (!this.selectedProduct || !this.nomorTujuan) return;
-
-    const payload = {
-      productId: this.selectedProduct.productId,
-      nomorTujuan: this.nomorTujuan
-    };
-
-    // this.transactionService.process(payload).subscribe({
-    //   next: (res) => {
-    //     this.router.navigate(['/transactions/result'], {
-    //       state: { result: res }
-    //     });
-    //   },
-    //   error: (err) => {
-    //     this.router.navigate(['/transactions/result'], {
-    //       state: { result: { status: 'FAILED', failureReason: err.message } }
-    //     });
-    //   }
-    // });
+    this.isLoading = true;
+    this.transactionService.buyProduct(
+      this.selectedProduct.productId,
+      this.nomorTujuan
+    ).subscribe({
+      next: (res) => {
+        console.log('Response transaksi:', res);
+        this.isLoading = false;
+        this.transactionDetail= res.data;
+        this.showModal = true;
+      },
+      error: (err) => {
+        this.transactionDetail = {
+          status: 'FAILED',
+          failureReason: err.error?.message
+        };
+        this.showModal = true;
+      }
+    });
   }
 
   onInputNomor(event: Event): void {
@@ -85,4 +94,16 @@ export class BuyComponent implements OnInit {
     input.value = input.value.replace(/[^0-9]/g, '');
     this.nomorTujuan = input.value;
   }
+
+  closeModal(): void {
+    this.showModal = false;
+    this.transactionDetail = null;
+  }
+
+  transaksiBaru(): void {
+    this.showModal = false;
+    this.selectedProduct = null;
+    this.nomorTujuan = '';
+  }
+
 }

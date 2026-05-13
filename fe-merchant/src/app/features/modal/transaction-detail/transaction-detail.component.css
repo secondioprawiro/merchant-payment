@@ -1,0 +1,195 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  padding: 16px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 420px;
+  background: #f5f4ef;
+  border-radius: 18px;
+  padding: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  font-family: Arial, sans-serif;
+}
+
+/* HEADER */
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.modal-header button {
+  border: 1px solid #d5d5d5;
+  background: white;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.modal-header span {
+  font-size: 20px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* STATUS CARD */
+.status-box {
+  background: #ffffff;
+  border: 1px solid #dedede;
+  border-radius: 18px;
+  padding: 14px 12px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.status-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  margin: 0 auto 18px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.status-icon.success {
+  background: #edf7e6;
+  color: #4c8b2b;
+}
+
+.status-icon.failed {
+  background: #faeaea;
+  color: #c23a3a;
+}
+
+h2 {
+  margin: 0;
+  margin-bottom: 4px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.green {
+  color: #3f7f20;
+}
+
+.red {
+  color: #b53737;
+}
+
+p {
+  color: #666;
+  font-size: 12px;
+  margin:0;
+}
+
+/* BADGE */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.badge-success {
+  background: #e8f3df;
+  color: #4c8b2b;
+}
+
+.badge-failed {
+  background: #f8e1e1;
+  color: #b53737;
+}
+
+/* DETAIL CARD */
+.detail-card {
+  background: white;
+  border: 1px solid #dcdcdc;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.detail-card h4 {
+  margin: 0;
+  padding: 10px, 12px;
+  font-size: 10px;
+  font-weight: 700;
+  border-bottom: 1px solid #ececec;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #ececec;
+  font-size: 11px;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row span:first-child {
+  color: #555;
+}
+
+.detail-row strong {
+  color: #111;
+}
+
+/* FAILED REASON */
+.detail-row .red {
+  font-weight: 600;
+}
+
+/* BUTTON */
+.btn-outline {
+  width: 100%;
+  border: 1px solid #cfcfcf;
+  background: white;
+  border-radius: 14px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background: #f4f4f4;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .modal-card {
+    padding: 14px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  .detail-row {
+    font-size: 13px;
+  }
+}
