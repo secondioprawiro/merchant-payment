@@ -45,6 +45,12 @@ export interface AdminStats {
   totalMerchant: number;
   totalMerchantAktif: number;
   totalMerchantNonAktif: number;
+  totalTransaksiHariIni: number;
+  totalBerhasilHariIni: number;
+  totalGagalHariIni: number;
+  totalTransaksiKeseluruhan: number;
+  totalBerhasilKeseluruhan: number;
+  totalGagalKeseluruhan: number;
 }
 
 export interface MerchantListItem {
@@ -76,9 +82,11 @@ export class MerchantService {
       .pipe(map(res => res.data));
   }
 
-  getTransactions(page = 0, size = 20): Observable<PageResponse<Transaction>> {
+  getTransactions(page = 0, size = 20, startDate?: string, endDate?: string): Observable<PageResponse<Transaction>> {
+    let url = `/gateway/transaction?page=${page}&size=${size}`;
+    if (startDate && endDate) url += `&startDate=${startDate}&endDate=${endDate}`;
     return this.http
-      .get<ApiResponse<PageResponse<Transaction>>>(`/gateway/transaction?page=${page}&size=${size}`)
+      .get<ApiResponse<PageResponse<Transaction>>>(url)
       .pipe(map(res => res.data));
   }
 

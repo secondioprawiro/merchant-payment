@@ -31,6 +31,17 @@
   <div class="tx-section">
     <div class="tx-header">
       <span class="tx-title">Semua Transaksi</span>
+      <div class="date-filter">
+        <input class="date-input" type="date" [(ngModel)]="startDate" />
+        <span class="date-sep">—</span>
+        <input class="date-input" type="date" [(ngModel)]="endDate" />
+        <button class="btn-filter" (click)="applyFilter()" [disabled]="!startDate || !endDate">Filter</button>
+        @if (isFiltered) {
+          <button class="btn-clear" (click)="clearFilter()">
+            <span class="material-icons-round">close</span>
+          </button>
+        }
+      </div>
     </div>
 
     @if (loadingTx) {
@@ -55,7 +66,7 @@
           </thead>
           <tbody>
             @for (tx of pagedTransactions; track tx.transactionId) {
-              <tr>
+              <tr class="tx-row" (click)="openDetail(tx)" style="cursor:pointer">
                 <td class="tx-id">{{ tx.refId }}</td>
                 <td class="tx-merchant">{{ tx.namaMerchant ?? '-' }}</td>
                 <td class="tx-product">
@@ -89,3 +100,11 @@
     }
   </div>
 </div>
+
+<app-transaction-detail
+  [detail]="selectedTransaction"
+  [showModal]="showDetail"
+  [hideActions]="true"
+  (onClose)="closeDetail()"
+  (onTransaksiBaru)="goToBeli()">
+</app-transaction-detail>

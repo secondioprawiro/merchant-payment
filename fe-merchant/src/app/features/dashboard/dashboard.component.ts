@@ -38,9 +38,13 @@ export class DashboardComponent implements OnInit {
     return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
   }
 
+  private get today(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
   loadTransactions() {
     this.loadingTx = true;
-    this.merchantService.getTransactions(this.page, this.pageSize).subscribe({
+    this.merchantService.getTransactions(this.page, this.pageSize, this.today, this.today).subscribe({
       next: (p) => { this.pagedTransactions = p.content; this.totalPages = p.totalPages; this.loadingTx = false; },
       error: () => { this.loadingTx = false; },
     });

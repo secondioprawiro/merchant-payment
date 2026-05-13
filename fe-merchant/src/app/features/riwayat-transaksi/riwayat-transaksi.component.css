@@ -75,6 +75,77 @@
   color: #1a1a2e;
 }
 
+/* Date filter */
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-input {
+  border: 1.5px solid #e2e2ee;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: #1a1a2e;
+  outline: none;
+  transition: border-color 0.15s;
+  cursor: pointer;
+}
+
+.date-input:focus {
+  border-color: #6c63ff;
+}
+
+.date-sep {
+  color: #9a9a9a;
+  font-size: 13px;
+}
+
+.btn-filter {
+  padding: 7px 16px;
+  border: none;
+  background: #6c63ff;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-filter:hover:not(:disabled) {
+  background: #5a52e0;
+}
+
+.btn-filter:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-clear {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid #e2e2ee;
+  border-radius: 8px;
+  background: #fff;
+  color: #9a9a9a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.btn-clear:hover {
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+.btn-clear .material-icons-round {
+  font-size: 16px;
+}
+
 /* Table */
 .tx-table-wrap {
   overflow-x: auto;
@@ -104,6 +175,10 @@
 
 .tx-table tbody tr:last-child td {
   border-bottom: none;
+}
+
+.tx-row:hover td {
+  background: #f8f8fc;
 }
 
 .tx-id {
