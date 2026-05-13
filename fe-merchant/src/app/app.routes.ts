@@ -18,6 +18,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/profil/profil/profil.component').then(m => m.ProfilComponent),
       },
+      {
+        path: 'riwayat-transaksi',
+        loadComponent: () =>
+          import('./features/riwayat-transaksi/riwayat-transaksi.component').then(m => m.RiwayatTransaksiComponent),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
