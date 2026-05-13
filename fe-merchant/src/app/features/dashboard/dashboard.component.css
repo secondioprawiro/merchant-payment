@@ -1,0 +1,233 @@
+.page {
+  padding: 32px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 24px;
+}
+
+/* Stats */
+.stats-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px 28px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9a9a9a;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1;
+}
+
+.stat-value.success { color: #27ae60; }
+.stat-value.danger  { color: #e74c3c; }
+
+.stat-sub {
+  font-size: 13px;
+  color: #9a9a9a;
+}
+
+.stat-sub.success { color: #27ae60; }
+.stat-sub.danger  { color: #e74c3c; }
+
+/* Transaksi section */
+.tx-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.tx-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.tx-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.tx-lihat-semua {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6c63ff;
+  text-decoration: none;
+}
+
+.tx-lihat-semua:hover {
+  text-decoration: underline;
+}
+
+/* Table */
+.tx-table-wrap {
+  overflow-x: auto;
+}
+
+.tx-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tx-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: #9a9a9a;
+  letter-spacing: 0.5px;
+  padding: 0 12px 12px;
+  border-bottom: 1px solid #f0f0f8;
+}
+
+.tx-table td {
+  padding: 14px 12px;
+  font-size: 14px;
+  color: #1a1a2e;
+  border-bottom: 1px solid #f8f8fc;
+}
+
+.tx-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tx-id {
+  font-weight: 600;
+  color: #4a4a6a;
+  font-size: 13px;
+}
+
+.tx-product {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.tx-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #27ae60;
+  flex-shrink: 0;
+}
+
+.tx-dot.dot-pln {
+  background: #3498db;
+}
+
+.tx-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge-success {
+  background: #eafaf1;
+  color: #27ae60;
+}
+
+.badge-failed {
+  background: #fdedec;
+  color: #e74c3c;
+}
+
+.tx-time {
+  color: #9a9a9a;
+  font-size: 13px;
+}
+
+.tx-empty {
+  color: #9a9a9a;
+  font-size: 14px;
+  text-align: center;
+  padding: 32px 0;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.page-btn {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid #e2e2ee;
+  border-radius: 8px;
+  background: #fff;
+  color: #4a4a6a;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: #6c63ff;
+  color: #6c63ff;
+}
+
+.page-btn.active {
+  background: #6c63ff;
+  border-color: #6c63ff;
+  color: #fff;
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Loading */
+.stats-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #9a9a9a;
+  font-size: 14px;
+  margin-bottom: 32px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}

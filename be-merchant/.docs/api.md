@@ -151,6 +151,7 @@ Authorization: Bearer <token>
   "message": "Success",
   "data": {
     "merchantId": "550e8400-e29b-41d4-a716-446655440000",
+    "kodeMerchant": "MCH-A1B2C3D4",
     "namaMerchant": "Toko Saya",
     "email": "merchant@example.com"
   }
@@ -187,6 +188,7 @@ Authorization: Bearer <token>
   "message": "Success",
   "data": {
     "merchantId": "550e8400-e29b-41d4-a716-446655440000",
+    "kodeMerchant": "MCH-A1B2C3D4",
     "namaMerchant": "Toko Saya",
     "email": "merchant@example.com"
   }

@@ -3,6 +3,7 @@ package com.berijalan.merchant_service.service.impl;
 import com.berijalan.merchant_service.client.ProductFeignClient;
 import com.berijalan.merchant_service.dto.request.ReqTransactionDto;
 import com.berijalan.merchant_service.dto.response.*;
+import com.berijalan.merchant_service.service.ProductService;
 import com.berijalan.merchant_service.entity.MerchantEntity;
 import com.berijalan.merchant_service.entity.MerchantTransactionEntity;
 import com.berijalan.merchant_service.exception.BadRequestException;
@@ -29,6 +30,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final MerchantRepository merchantRepository;
     private final MerchantTransactionRepository transactionRepository;
     private final ProductFeignClient productClient;
+    private final ProductService productService;
 
     @Override
     public MerchantTransactionEntity buyProduct(String userId, ReqTransactionDto request) {
@@ -45,7 +47,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         BaseResponse<ResProductDto> productData;
         try {
-            productData = productClient.getProductById(request.getProductId());
+            productData = productService.getProductById(request.getProductId());
         } catch (FeignException.NotFound e) {
             log.warn("Transaction rejected - product not found: productId={}", request.getProductId());
             throw new DataNotFoundException("Produk tidak ditemukan");

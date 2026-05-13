@@ -5,8 +5,26 @@ import { map } from 'rxjs/operators';
 
 export interface MerchantProfile {
   merchantId: string;
+  kodeMerchant: string;
   namaMerchant: string;
   email: string;
+}
+
+export interface MerchantStats {
+  totalTransaksiHariIni: number;
+  totalBerhasilHariIni: number;
+  totalGagalHariIni: number;
+}
+
+export interface Transaction {
+  transactionId: string;
+  refId: string;
+  productName: string;
+  nomorTujuan: string;
+  amount: number;
+  status: 'SUCCESS' | 'FAILED';
+  failureReason: string | null;
+  transactionDate: string;
 }
 
 export interface UpdateProfileRequest {
@@ -28,6 +46,18 @@ export class MerchantService {
   getProfile(): Observable<MerchantProfile> {
     return this.http
       .get<ApiResponse<MerchantProfile>>(`${this.BASE}/me`)
+      .pipe(map(res => res.data));
+  }
+
+  getTransactions(): Observable<Transaction[]> {
+    return this.http
+      .get<ApiResponse<Transaction[]>>('/gateway/transaction')
+      .pipe(map(res => res.data));
+  }
+
+  getMerchantStats(): Observable<MerchantStats> {
+    return this.http
+      .get<ApiResponse<MerchantStats>>('/gateway/stats/merchant')
       .pipe(map(res => res.data));
   }
 

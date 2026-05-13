@@ -14,6 +14,9 @@ import com.berijalan.merchant_service.repository.MerchantRepository;
 import com.berijalan.merchant_service.service.MerchantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,6 +33,7 @@ public class MerchantServiceImpl implements MerchantService {
     private final AuthFeignClient authFeignClient;
 
     @Override
+    @CacheEvict(value = "merchants", key = "'all'")
     public void createMerchant(ReqInternalCreateMerchantDto request) {
         String kodeMerchant = generateKodeMerchant();
 
@@ -45,6 +49,7 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
+    @Cacheable(value = "merchants", key = "'all'")
     public List<ResMerchantDto> getAllMerchants() {
         return merchantRepository.findAllByIsDeletedFalse().stream()
                 .map(m -> new ResMerchantDto(m.getKodeMerchant(), m.getNamaMerchant()))
@@ -52,6 +57,7 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
+    @Cacheable(value = "merchant-by-id", key = "#merchantId")
     public ResDetailMerchantDto getDetailMerchant(UUID merchantId) {
         MerchantEntity merchant = merchantRepository.findByMerchantIdAndIsDeletedFalse(merchantId)
                 .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
@@ -60,10 +66,11 @@ public class MerchantServiceImpl implements MerchantService {
                 .getAccountById(UUID.fromString(merchant.getAccountId()))
                 .getData();
 
-        return new ResDetailMerchantDto(merchant.getMerchantId(), merchant.getNamaMerchant(), account.getEmail());
+        return new ResDetailMerchantDto(merchant.getMerchantId(), merchant.getKodeMerchant(), merchant.getNamaMerchant(), account.getEmail());
     }
 
     @Override
+    @Cacheable(value = "merchant-by-user", key = "#userId")
     public ResDetailMerchantDto getMyMerchant(String userId) {
         MerchantEntity merchant = merchantRepository.findByAccountId(userId)
                 .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
@@ -73,10 +80,15 @@ public class MerchantServiceImpl implements MerchantService {
                 .getData();
 
         log.info("Fetched own merchant: merchantId={}, userId={}", merchant.getMerchantId(), userId);
-        return new ResDetailMerchantDto(merchant.getMerchantId(), merchant.getNamaMerchant(), account.getEmail());
+        return new ResDetailMerchantDto(merchant.getMerchantId(), merchant.getKodeMerchant(), merchant.getNamaMerchant(), account.getEmail());
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "merchants", key = "'all'"),
+            @CacheEvict(value = "merchant-by-id", key = "#merchantId"),
+            @CacheEvict(value = "merchant-by-user", allEntries = true)
+    })
     public ResDetailMerchantDto updateMerchant(UUID merchantId, ReqUpdateMerchantDto request, String userId, String role) {
         MerchantEntity merchant = merchantRepository.findByMerchantIdAndIsDeletedFalse(merchantId)
                 .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
@@ -97,10 +109,15 @@ public class MerchantServiceImpl implements MerchantService {
                 .getData();
 
         log.info("Merchant updated: merchantId={}", merchantId);
-        return new ResDetailMerchantDto(merchant.getMerchantId(), merchant.getNamaMerchant(), updatedAccount.getEmail());
+        return new ResDetailMerchantDto(merchant.getMerchantId(), merchant.getKodeMerchant(), merchant.getNamaMerchant(), updatedAccount.getEmail());
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "merchants", key = "'all'"),
+            @CacheEvict(value = "merchant-by-id", key = "#merchantId"),
+            @CacheEvict(value = "merchant-by-user", allEntries = true)
+    })
     public void deleteMerchant(UUID merchantId, String userId, String role) {
         MerchantEntity merchant = merchantRepository.findByMerchantIdAndIsDeletedFalse(merchantId)
                 .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));

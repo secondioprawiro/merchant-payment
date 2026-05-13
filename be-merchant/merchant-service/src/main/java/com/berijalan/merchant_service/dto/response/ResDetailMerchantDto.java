@@ -11,6 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ResDetailMerchantDto {
     private UUID merchantId;
+    private String kodeMerchant;
     private String namaMerchant;
     private String email;
 }

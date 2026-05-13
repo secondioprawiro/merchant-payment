@@ -41,10 +41,10 @@
 
   <!-- Merchant info -->
   <div class="merchant-footer">
-    <div class="merchant-avatar">{{ merchant.initials }}</div>
+    <div class="merchant-avatar">{{ initials }}</div>
     <div class="merchant-info">
-      <span class="merchant-name">{{ merchant.name }}</span>
-      <span class="merchant-code">{{ merchant.code }}</span>
+      <span class="merchant-name">{{ profile?.namaMerchant ?? '...' }}</span>
+      <span class="merchant-code">{{ profile?.kodeMerchant ?? '...' }}</span>
     </div>
     <button class="logout-btn" (click)="logout()" title="Logout">
       <span class="material-icons-round">logout</span>
