@@ -112,6 +112,12 @@
   font-size: 13px;
 }
 
+.tx-merchant {
+  font-weight: 600;
+  color: #1a1a2e;
+  font-size: 13px;
+}
+
 .tx-product {
   display: flex;
   align-items: center;

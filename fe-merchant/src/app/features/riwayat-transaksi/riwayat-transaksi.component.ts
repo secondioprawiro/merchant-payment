@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { MerchantService, Transaction } from '../../core/services/merchant.service';
+import { MerchantService, MerchantStats, Transaction } from '../../core/services/merchant.service';
 
 @Component({
   selector: 'app-riwayat-transaksi',
@@ -11,31 +11,23 @@ import { MerchantService, Transaction } from '../../core/services/merchant.servi
 export class RiwayatTransaksiComponent implements OnInit {
   private merchantService = inject(MerchantService);
 
-  transactions: Transaction[] = [];
-  loading = true;
+  stats: MerchantStats | null = null;
+  loadingStats = true;
+
+  pagedTransactions: Transaction[] = [];
+  loadingTx = true;
   page = 0;
+  totalPages = 0;
   readonly pageSize = 10;
 
-  get totalKeseluruhan(): number { return this.transactions.length; }
-  get totalBerhasil(): number { return this.transactions.filter(t => t.status === 'SUCCESS').length; }
-  get totalGagal(): number { return this.transactions.filter(t => t.status === 'FAILED').length; }
-
   get successRate(): number {
-    if (this.totalKeseluruhan === 0) return 0;
-    return Math.round((this.totalBerhasil / this.totalKeseluruhan) * 100);
+    if (!this.stats || this.stats.totalTransaksiKeseluruhan === 0) return 0;
+    return Math.round((this.stats.totalBerhasilKeseluruhan / this.stats.totalTransaksiKeseluruhan) * 100);
   }
 
-  get pagedTransactions(): Transaction[] {
-    const start = this.page * this.pageSize;
-    return this.transactions.slice(start, start + this.pageSize);
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.transactions.length / this.pageSize);
-  }
-
-  prevPage() { if (this.page > 0) this.page--; }
-  nextPage() { if (this.page < this.totalPages - 1) this.page++; }
+  prevPage() { if (this.page > 0) { this.page--; this.loadTransactions(); } }
+  nextPage() { if (this.page < this.totalPages - 1) { this.page++; this.loadTransactions(); } }
+  goToPage(p: number) { this.page = p; this.loadTransactions(); }
 
   formatDateTime(dateStr: string): string {
     const d = new Date(dateStr);
@@ -45,10 +37,19 @@ export class RiwayatTransaksiComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.merchantService.getTransactions().subscribe({
-      next: (t) => { this.transactions = t; this.loading = false; },
-      error: () => { this.loading = false; },
+  loadTransactions() {
+    this.loadingTx = true;
+    this.merchantService.getTransactions(this.page, this.pageSize).subscribe({
+      next: (p) => { this.pagedTransactions = p.content; this.totalPages = p.totalPages; this.loadingTx = false; },
+      error: () => { this.loadingTx = false; },
     });
+  }
+
+  ngOnInit() {
+    this.merchantService.getMerchantStats().subscribe({
+      next: (s) => { this.stats = s; this.loadingStats = false; },
+      error: () => { this.loadingStats = false; },
+    });
+    this.loadTransactions();
   }
 }

@@ -57,4 +57,7 @@ public class MerchantTransactionEntity {
     @CreationTimestamp
     @Column(name = "transaction_date", nullable = false, updatable = false)
     private LocalDateTime transactionDate;
+
+    @Transient
+    private String namaMerchant;
 }

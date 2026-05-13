@@ -52,7 +52,7 @@ public class MerchantServiceImpl implements MerchantService {
     @Cacheable(value = "merchants", key = "'all'")
     public List<ResMerchantDto> getAllMerchants() {
         return merchantRepository.findAllByIsDeletedFalse().stream()
-                .map(m -> new ResMerchantDto(m.getKodeMerchant(), m.getNamaMerchant()))
+                .map(m -> new ResMerchantDto(m.getMerchantId(), m.getKodeMerchant(), m.getNamaMerchant(), m.getStatus()))
                 .collect(Collectors.toList());
     }
 

@@ -2,26 +2,26 @@
   <h1 class="page-title">Riwayat Transaksi</h1>
 
   <!-- Stats -->
-  @if (loading) {
+  @if (loadingStats) {
     <div class="stats-loading">
       <span class="material-icons-round spinning">autorenew</span>
       Memuat statistik...
     </div>
-  } @else {
+  } @else if (stats) {
     <div class="stats-grid">
       <div class="stat-card">
         <span class="stat-label">TOTAL KESELURUHAN</span>
-        <span class="stat-value">{{ totalKeseluruhan }}</span>
+        <span class="stat-value">{{ stats.totalTransaksiKeseluruhan }}</span>
         <span class="stat-sub">transaksi</span>
       </div>
       <div class="stat-card">
         <span class="stat-label">BERHASIL</span>
-        <span class="stat-value success">{{ totalBerhasil }}</span>
+        <span class="stat-value success">{{ stats.totalBerhasilKeseluruhan }}</span>
         <span class="stat-sub success">{{ successRate }}% success rate</span>
       </div>
       <div class="stat-card">
         <span class="stat-label">GAGAL</span>
-        <span class="stat-value danger">{{ totalGagal }}</span>
+        <span class="stat-value danger">{{ stats.totalGagalKeseluruhan }}</span>
         <span class="stat-sub danger">perlu dicek</span>
       </div>
     </div>
@@ -33,12 +33,12 @@
       <span class="tx-title">Semua Transaksi</span>
     </div>
 
-    @if (loading) {
+    @if (loadingTx) {
       <div class="stats-loading">
         <span class="material-icons-round spinning">autorenew</span>
         Memuat transaksi...
       </div>
-    } @else if (transactions.length === 0) {
+    } @else if (pagedTransactions.length === 0) {
       <p class="tx-empty">Belum ada transaksi.</p>
     } @else {
       <div class="tx-table-wrap">
@@ -46,6 +46,7 @@
           <thead>
             <tr>
               <th>ID TRANSAKSI</th>
+              <th>MERCHANT</th>
               <th>PRODUK</th>
               <th>NOMOR TUJUAN</th>
               <th>STATUS</th>
@@ -56,6 +57,7 @@
             @for (tx of pagedTransactions; track tx.transactionId) {
               <tr>
                 <td class="tx-id">{{ tx.refId }}</td>
+                <td class="tx-merchant">{{ tx.namaMerchant ?? '-' }}</td>
                 <td class="tx-product">
                   <span class="tx-dot" [class.dot-pln]="tx.productName.toLowerCase().includes('pln')"></span>
                   {{ tx.productName }}
@@ -77,7 +79,7 @@
         <div class="pagination">
           <button class="page-btn" (click)="prevPage()" [disabled]="page === 0">‹</button>
           @for (p of [].constructor(totalPages); track $index) {
-            <button class="page-btn" [class.active]="$index === page" (click)="page = $index">
+            <button class="page-btn" [class.active]="$index === page" (click)="goToPage($index)">
               {{ $index + 1 }}
             </button>
           }

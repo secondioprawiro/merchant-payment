@@ -17,11 +17,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -93,14 +98,24 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<MerchantTransactionEntity> getAllTransactions(String userId, String role) {
+    public Page<MerchantTransactionEntity> getAllTransactions(String userId, String role, Pageable pageable) {
+        Page<MerchantTransactionEntity> transactions;
         if (role.equals("ADMIN")) {
-            return transactionRepository.findAll();
-        }else{
+            transactions = transactionRepository.findAll(pageable);
+        } else {
             MerchantEntity merchant = merchantRepository.findByAccountId(userId)
                     .orElseThrow(() -> new DataNotFoundException("Merchant tidak ditemukan"));
-            return transactionRepository.findByMerchantId(merchant.getMerchantId());
+            transactions = transactionRepository.findByMerchantId(merchant.getMerchantId(), pageable);
         }
+
+        Set<UUID> merchantIds = transactions.stream()
+                .map(MerchantTransactionEntity::getMerchantId)
+                .collect(Collectors.toSet());
+        Map<UUID, String> merchantNames = merchantRepository.findAllById(merchantIds).stream()
+                .collect(Collectors.toMap(MerchantEntity::getMerchantId, MerchantEntity::getNamaMerchant));
+        transactions.forEach(tx -> tx.setNamaMerchant(merchantNames.get(tx.getMerchantId())));
+
+        return transactions;
     }
 
 

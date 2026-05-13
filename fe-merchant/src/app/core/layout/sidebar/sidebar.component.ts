@@ -28,7 +28,6 @@ export class SidebarComponent implements OnInit {
 
   accountItems: NavItem[] = [
     { label: 'Profil', icon: 'person', route: '/profil' },
-    { label: 'Pengaturan', icon: 'settings', route: '/pengaturan' },
   ];
 
   profile: MerchantProfile | null = null;

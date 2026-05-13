@@ -6,10 +6,12 @@ import com.berijalan.merchant_service.dto.response.BaseResponse;
 import com.berijalan.merchant_service.entity.MerchantTransactionEntity;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 
@@ -36,10 +38,13 @@ public class TransactionController {
     @GetMapping()
     public ResponseEntity<BaseResponse<?>> getAllTransactions(
             @RequestHeader("X-User-Id") String userId,
-            @RequestHeader("X-User-Role") String role
+            @RequestHeader("X-User-Role") String role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
     ){
-        List<MerchantTransactionEntity> transaction = transactionService.getAllTransactions(userId, role);
-        return ResponseEntity.ok(BaseResponse.success("Success", transaction));
+        Page<MerchantTransactionEntity> transactions = transactionService.getAllTransactions(
+                userId, role, PageRequest.of(page, size, Sort.by("transactionDate").descending()));
+        return ResponseEntity.ok(BaseResponse.success("Success", transactions));
     }
 
     @GetMapping("{transactionId}")
