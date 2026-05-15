@@ -2,11 +2,13 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MerchantService, MerchantStats, Transaction } from '../../core/services/merchant.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { TransactionDetailComponent } from '../modal/transaction-detail/transaction-detail.component';
+
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TransactionDetailComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -14,6 +16,9 @@ export class DashboardComponent implements OnInit {
   private merchantService = inject(MerchantService);
   private auth = inject(AuthService);
   private router = inject(Router);
+
+  selectedTransaction: any = null;
+  showDetail = false;
 
   stats: MerchantStats | null = null;
   loadingStats = true;
@@ -63,4 +68,8 @@ export class DashboardComponent implements OnInit {
 
     this.loadTransactions();
   }
+
+  openDetail(tx: Transaction) { this.selectedTransaction = tx; this.showDetail = true; }
+  closeDetail() { this.showDetail = false; this.selectedTransaction = null; }
+  goToBeli() { this.showDetail = false; this.router.navigate(['/beli-produk']); }
 }

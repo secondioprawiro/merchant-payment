@@ -35,7 +35,7 @@
       </div>
       <div class="detail-row">
         <span class="detail-label">Produk</span>
-        <span class="detail-value amount">{{ detail?.amount | number }}</span>
+        <span class="detail-value amount">{{ detail?.productName }}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Nomor tujuan</span>
@@ -46,6 +46,10 @@
         <span class="detail-value">{{ detail?.transactionDate | date:'dd MMM yyyy, HH:mm' }}</span>
       </div>
       <div class="detail-row">
+        <span class="detail-label">Total</span>
+        <span class="detail-value amount">{{ detail?.amount | number }}</span>
+      </div>
+      <div class="detail-row">
         <span class="detail-label">Status</span>
         <span class="badge" [class.badge-success]="detail?.status === 'SUCCESS'"
               [class.badge-failed]="detail?.status === 'FAILED'">
@@ -54,14 +58,14 @@
       </div>
       <div class="detail-row" *ngIf="detail?.status === 'FAILED'">
         <span class="detail-label">Alasan gagal</span>
-        <span class="detail-value red">{{ detail?.failureReason }}</span>
+        <span class="detail-value red">{{ getFailureReason(detail?.failureReason) }}</span>
       </div>
     </div>
 
     @if (!hideActions) {
       <div class="action-buttons">
-        <button class="btn-primary" (click)="transaksiBaru()">⚡ Transaksi baru</button>
-        <button class="btn-secondary" routerLink="/dashboard">⊞ Ke dashboard</button>
+        <button class="btn-primary" (click)="transaksiBaru()">Transaksi baru</button>
+        <button class="btn-secondary" routerLink="/dashboard">Ke dashboard</button>
       </div>
     }
 

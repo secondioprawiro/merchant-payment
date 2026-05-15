@@ -1,0 +1,38 @@
+.warning-dialog {
+  text-align: center;
+  padding: 1rem;
+
+  .warning-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #fff8e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+
+    mat-icon {
+      color: #f9a825;
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  h2 { margin: 0 0 0.5rem; font-size: 18px; font-weight: 500; }
+  p  { color: #666; font-size: 14px; margin: 0; }
+
+  mat-dialog-actions button {
+    width: 100%;
+    background: #1a1a2e;
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px;
+  }
+}
+
+.custom-warning-dialog .mat-mdc-dialog-surface {
+  border-radius: 18px !important;
+  overflow: hidden;
+}

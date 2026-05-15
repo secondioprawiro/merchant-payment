@@ -55,7 +55,7 @@
           </thead>
           <tbody>
             @for (tx of pagedTransactions; track tx.transactionId) {
-              <tr>
+              <tr class="tx-row" (click)="openDetail(tx)" style="cursor:pointer">
                 <td class="tx-id">{{ tx.refId }}</td>
                 <td class="tx-product">
                   <span class="tx-dot" [class.dot-pln]="tx.productName.toLowerCase().includes('pln')"></span>
@@ -88,3 +88,11 @@
     }
   </div>
 </div>
+
+<app-transaction-detail
+  [detail]="selectedTransaction"
+  [showModal]="showDetail"
+  [hideActions]="true"
+  (onClose)="closeDetail()"
+  (onTransaksiBaru)="goToBeli()">
+</app-transaction-detail>

@@ -85,6 +85,7 @@ public class TransactionServiceImpl implements TransactionService {
         MerchantTransactionEntity transaction = new MerchantTransactionEntity();
         transaction.setMerchantId(merchant.getMerchantId());
         transaction.setProductId(request.getProductId());
+        transaction.setNamaMerchant(merchant.getNamaMerchant());
         transaction.setProductName(productResponse.getProductName());
         transaction.setNomorTujuan(request.getNomorTujuan());
         transaction.setRefId(productResponse.getRefId());

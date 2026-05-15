@@ -7,6 +7,9 @@ import { ProductService } from '../../../core/services/product.service';
 import {MerchantService} from '../../../core/services/merchant.service';
 import {TransactionService} from '../../../core/services/transaction.service';
 import {TransactionDetailComponent } from '../../modal/transaction-detail/transaction-detail.component';
+import { MatDialog } from '@angular/material/dialog';
+import {WarningDialogComponent } from '../../modal/warning-dialog/warning-dialog.component';
+
 
 interface Product {
   productId: string;
@@ -42,7 +45,8 @@ export class BuyComponent implements OnInit {
     private productService: ProductService,
     private merchantService : MerchantService,
     private transactionService: TransactionService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -66,6 +70,14 @@ export class BuyComponent implements OnInit {
     this.selectedProduct = product;
   }
 
+  private showWarning(message: string) {
+    this.dialog.open(WarningDialogComponent, {
+      width: '360px',
+      data: { message },
+      disableClose: true
+    });
+  }
+
   prosesTransaksi(): void {
     if (!this.selectedProduct || !this.nomorTujuan) return;
     this.isLoading = true;
@@ -80,11 +92,14 @@ export class BuyComponent implements OnInit {
         this.showModal = true;
       },
       error: (err) => {
-        this.transactionDetail = {
-          status: 'FAILED',
-          failureReason: err.error?.message
-        };
-        this.showModal = true;
+        const status = err.status;
+        const message = err.error?.message ?? 'Terjadi kesalahan';
+
+        if (status === 400 || status === 404) {
+          this.showWarning(message);
+        } else {
+          this.showWarning('Gagal menghubungi server, coba lagi.');
+        }
       }
     });
   }

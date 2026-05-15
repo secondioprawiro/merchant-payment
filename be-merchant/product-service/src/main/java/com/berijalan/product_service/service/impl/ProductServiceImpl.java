@@ -65,10 +65,10 @@ public class ProductServiceImpl implements ProductService {
                     .build();
         }else{
             List<String> reasons = List.of(
-                    "Nomor tujuan tidak valid",
-                    "Gangguan jaringan provider",
-                    "Stok produk habis",
-                    "Timeout dari provider"
+                    "DESTINATION_INACTIVE",
+                    "PROVIDER_NETWORK_ERROR",
+                    "INSUFFICIENT_STOCK",
+                    "PROVIDER_TIMEOUT"
             );
             String randomReason = reasons.get((int)(Math.random()* reasons.size()));
             log.warn("Transaction processed: productId={}, nomorTujuan={}, status=FAILED, reason={}", request.getProductId(), request.getNomorTujuan(), randomReason);

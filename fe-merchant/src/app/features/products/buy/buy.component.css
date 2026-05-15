@@ -1,22 +1,18 @@
-/* Layout */
 .page {
-  margin-bottom: 4px;
+  padding: 32px;
 }
 
-.page-header {
-  margin-bottom: 20px;
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 6px;
 }
 
-.page-header h2 {
-  font-size: 20px;
-  font-weight: 500;
-  margin-bottom: 4px;
-  font-weight: bold;
-}
-
-.page-header p {
-  font-size: 13px;
-  color: #888;
+.page-subtitle {
+  font-size: 14px;
+  color: #9a9a9a;
+  margin: 0 0 24px;
 }
 
 .content-grid {

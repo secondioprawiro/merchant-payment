@@ -1,0 +1,12 @@
+<div class="warning-dialog">
+  <div class="warning-icon">
+    <mat-icon>warning_amber</mat-icon>
+  </div>
+  <h2 mat-dialog-title>Peringatan</h2>
+  <mat-dialog-content>
+    <p>{{ data.message }}</p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="center">
+    <button mat-flat-button (click)="close()">Coba lagi</button>
+  </mat-dialog-actions>
+</div>

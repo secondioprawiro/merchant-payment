@@ -23,4 +23,15 @@ export class TransactionDetailComponent {
   transaksiBaru(): void {
     this.onTransaksiBaru.emit();
   }
+
+  failureReasonMap: Record<string, string> = {
+    'PROVIDER_TIMEOUT': 'Koneksi Provider Timeout',
+    'DESTINATION_INACTIVE': 'Nomor Tujuan Tidak Aktif',
+    'INSUFFICIENT_STOCK': 'Stok Produk Tidak Tersedia',
+    'PROVIDER_NETWORK_ERROR': 'Gangguan Jaringan Provider'
+  }
+
+  getFailureReason(reason: string): string {
+    return this.failureReasonMap[reason] || reason
+  }
 }

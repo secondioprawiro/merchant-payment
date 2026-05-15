@@ -75,6 +75,10 @@
   color: #1a1a2e;
 }
 
+.tx-row:hover td {
+  background: #f8f8fc;
+}
+
 .tx-lihat-semua {
   font-size: 13px;
   font-weight: 600;
