@@ -19,12 +19,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Cacheable(value = "products-list", key = "#type ?: 'ALL'")
     public BaseResponse<?> getAllProduct(String type) {
+        log.info("Cache Miss, fetching from external API");
         return productClient.getAllProduct(type);
+
     }
 
     @Override
     @Cacheable(value = "products", key = "#productId")
     public BaseResponse<ResProductDto> getProductById(String productId) {
+        log.info("Cache MISS product, fetching from external API. productId={}", productId);
         return productClient.getProductById(productId);
     }
 }
