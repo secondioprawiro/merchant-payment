@@ -45,6 +45,7 @@
 
 .stat-value.success { color: #27ae60; }
 .stat-value.neutral { color: #4a4a6a; }
+.stat-value.danger  { color: #e74c3c; }
 
 .stat-sub {
   font-size: 13px;
@@ -53,6 +54,7 @@
 
 .stat-sub.success { color: #27ae60; }
 .stat-sub.neutral { color: #9a9a9a; }
+.stat-sub.danger  { color: #e74c3c; }
 
 /* Loading / Error */
 .loading-state,

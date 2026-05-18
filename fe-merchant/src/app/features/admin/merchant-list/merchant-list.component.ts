@@ -35,6 +35,10 @@ export class MerchantListComponent implements OnInit, OnDestroy {
     return Math.round((this.stats.totalMerchantAktif / this.stats.totalMerchant) * 100);
   }
 
+  get totalDihapus(): number {
+    return this.merchants.filter(m => m.isDeleted).length;
+  }
+
   // Edit modal
   editTarget: MerchantListItem | null = null;
   editForm: UpdateProfileRequest = {};
