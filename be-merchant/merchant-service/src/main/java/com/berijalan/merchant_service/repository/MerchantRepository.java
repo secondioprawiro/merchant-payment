@@ -13,4 +13,5 @@ public interface MerchantRepository extends JpaRepository<MerchantEntity, UUID> 
     Optional<MerchantEntity> findByMerchantIdAndIsDeletedFalse(UUID merchantId);
     Optional<MerchantEntity> findByAccountId(String userId);
     long countByStatus(MerchantEntity.Status status);
+    long countByStatusAndIsDeletedFalse(MerchantEntity.Status status);
 }

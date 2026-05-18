@@ -153,7 +153,7 @@ public class TransactionServiceImpl implements TransactionService {
         return ResAdminStatsDto.builder()
                 .totalMerchant(merchantRepository.count())
                 .totalMerchantAktif(merchantRepository.countByStatus(MerchantEntity.Status.ACTIVE))
-                .totalMerchantNonAktif(merchantRepository.countByStatus(MerchantEntity.Status.INACTIVE))
+                .totalMerchantNonAktif(merchantRepository.countByStatusAndIsDeletedFalse(MerchantEntity.Status.INACTIVE))
                 .totalTransaksiHariIni(transactionRepository.countByTransactionDateBetween(startOfDay, endOfDay))
                 .totalBerhasilHariIni(transactionRepository.countByStatusAndTransactionDateBetween(MerchantTransactionEntity.Status.SUCCESS, startOfDay, endOfDay))
                 .totalGagalHariIni(transactionRepository.countByStatusAndTransactionDateBetween(MerchantTransactionEntity.Status.FAILED,startOfDay,endOfDay))
