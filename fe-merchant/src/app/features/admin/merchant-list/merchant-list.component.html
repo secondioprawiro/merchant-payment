@@ -40,6 +40,12 @@
     </div>
   } @else {
     <div class="table-card">
+      <div class="tabs">
+        <button class="tab" [class.active]="activeTab === 'semua'"    (click)="activeTab = 'semua'">Semua</button>
+        <button class="tab" [class.active]="activeTab === 'aktif'"    (click)="activeTab = 'aktif'">Aktif</button>
+        <button class="tab" [class.active]="activeTab === 'nonaktif'" (click)="activeTab = 'nonaktif'">Nonaktif</button>
+        <button class="tab" [class.active]="activeTab === 'dihapus'"  (click)="activeTab = 'dihapus'">Dihapus</button>
+      </div>
       <div class="table-wrap">
         <table class="merchant-table">
           <thead>
@@ -47,32 +53,38 @@
               <th>KODE MERCHANT</th>
               <th>NAMA MERCHANT</th>
               <th>STATUS</th>
-              <th>AKSI</th>
+              @if (activeTab !== 'dihapus') { <th>AKSI</th> }
             </tr>
           </thead>
           <tbody>
-            @if (merchants.length === 0) {
+            @if (filteredMerchants.length === 0) {
               <tr>
                 <td colspan="4" class="empty">Belum ada merchant.</td>
               </tr>
             }
-            @for (m of merchants; track m.merchantId) {
+            @for (m of filteredMerchants; track m.merchantId) {
               <tr>
                 <td class="kode">{{ m.kodeMerchant }}</td>
-                <td class="nama">{{ m.namaMerchant }}</td>
+                <td class="nama" [class.deleted]="m.isDeleted">{{ m.namaMerchant }}</td>
                 <td>
-                  <span class="status-badge" [class.active]="m.status === 'ACTIVE'" [class.inactive]="m.status !== 'ACTIVE'">
-                    {{ m.status === 'ACTIVE' ? 'Aktif' : 'Nonaktif' }}
-                  </span>
+                  @if (m.isDeleted) {
+                    <span class="status-badge deleted">Dihapus</span>
+                  } @else {
+                    <span class="status-badge" [class.active]="m.status === 'ACTIVE'" [class.inactive]="m.status !== 'ACTIVE'">
+                      {{ m.status === 'ACTIVE' ? 'Aktif' : 'Nonaktif' }}
+                    </span>
+                  }
                 </td>
-                <td class="action-cell">
-                  <button class="btn-action edit" (click)="openEdit(m)" title="Edit">
-                    <span class="material-icons-round">edit</span>
-                  </button>
-                  <button class="btn-action delete" (click)="openDelete(m)" title="Hapus">
-                    <span class="material-icons-round">delete</span>
-                  </button>
-                </td>
+                @if (activeTab !== 'dihapus') {
+                  <td class="action-cell">
+                    <button class="btn-action edit" (click)="openEdit(m)" title="Edit">
+                      <span class="material-icons-round">edit</span>
+                    </button>
+                    <button class="btn-action delete" (click)="openDelete(m)" title="Hapus">
+                      <span class="material-icons-round">delete</span>
+                    </button>
+                  </td>
+                }
               </tr>
             }
           </tbody>
@@ -105,13 +117,11 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="edit-email">Email (opsional)</label>
-          <input id="edit-email" class="field-input" type="email" [(ngModel)]="editForm.email" placeholder="Kosongkan jika tidak diubah" />
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="edit-pw">Password baru (opsional)</label>
-          <input id="edit-pw" class="field-input" type="password" [(ngModel)]="editForm.password" placeholder="Kosongkan jika tidak diubah" />
+          <label class="field-label" for="edit-status">Status</label>
+          <select id="edit-status" class="field-input" [(ngModel)]="editForm.status">
+            <option value="ACTIVE">Aktif</option>
+            <option value="INACTIVE">Nonaktif</option>
+          </select>
         </div>
 
         @if (editError) {

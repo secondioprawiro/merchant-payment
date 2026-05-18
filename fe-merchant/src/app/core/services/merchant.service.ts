@@ -58,10 +58,12 @@ export interface MerchantListItem {
   kodeMerchant: string;
   namaMerchant: string;
   status: string;
+  isDeleted: boolean;
 }
 
 export interface UpdateProfileRequest {
   namaMerchant?: string;
+  status?: 'ACTIVE' | 'INACTIVE';
   email?: string;
   password?: string;
 }

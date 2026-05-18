@@ -19,6 +19,17 @@ export class MerchantListComponent implements OnInit, OnDestroy {
   loading = true;
   error = '';
 
+  activeTab: 'semua' | 'aktif' | 'nonaktif' | 'dihapus' = 'semua';
+
+  get filteredMerchants(): MerchantListItem[] {
+    switch (this.activeTab) {
+      case 'aktif':    return this.merchants.filter(m => !m.isDeleted && m.status === 'ACTIVE');
+      case 'nonaktif': return this.merchants.filter(m => !m.isDeleted && m.status !== 'ACTIVE');
+      case 'dihapus':  return this.merchants.filter(m => m.isDeleted);
+      default:         return this.merchants;
+    }
+  }
+
   get aktifRate(): number {
     if (!this.stats || this.stats.totalMerchant === 0) return 0;
     return Math.round((this.stats.totalMerchantAktif / this.stats.totalMerchant) * 100);
@@ -50,6 +61,12 @@ export class MerchantListComponent implements OnInit, OnDestroy {
     document.body.style.overflow = '';
   }
 
+  refreshStats() {
+    this.merchantService.getAdminStats().subscribe({
+      next: (s) => { this.stats = s; },
+    });
+  }
+
   loadMerchants() {
     this.loading = true;
     this.error = '';
@@ -61,7 +78,7 @@ export class MerchantListComponent implements OnInit, OnDestroy {
 
   openEdit(merchant: MerchantListItem) {
     this.editTarget = merchant;
-    this.editForm = { namaMerchant: merchant.namaMerchant };
+    this.editForm = { namaMerchant: merchant.namaMerchant, status: merchant.status as 'ACTIVE' | 'INACTIVE' };
     this.editError = '';
     this.lockScroll();
   }
@@ -77,18 +94,19 @@ export class MerchantListComponent implements OnInit, OnDestroy {
     if (!this.editTarget) return;
     const payload: UpdateProfileRequest = {};
     if (this.editForm.namaMerchant?.trim()) payload.namaMerchant = this.editForm.namaMerchant.trim();
-    if (this.editForm.email?.trim()) payload.email = this.editForm.email.trim();
-    if (this.editForm.password?.trim()) payload.password = this.editForm.password.trim();
+    if (this.editForm.status) payload.status = this.editForm.status;
 
     this.editLoading = true;
     this.editError = '';
     this.merchantService.updateProfile(this.editTarget.merchantId, payload).subscribe({
       next: () => {
-        if (this.editTarget && payload.namaMerchant) {
-          this.editTarget.namaMerchant = payload.namaMerchant;
+        if (this.editTarget) {
+          if (payload.namaMerchant) this.editTarget.namaMerchant = payload.namaMerchant;
+          if (payload.status) this.editTarget.status = payload.status;
         }
         this.editLoading = false;
         this.closeEdit();
+        this.refreshStats();
       },
       error: () => { this.editError = 'Gagal menyimpan perubahan.'; this.editLoading = false; },
     });

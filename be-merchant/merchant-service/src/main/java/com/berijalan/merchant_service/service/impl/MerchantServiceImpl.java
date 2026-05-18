@@ -51,8 +51,8 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     @Cacheable(value = "merchants", key = "'all'")
     public List<ResMerchantDto> getAllMerchants() {
-        return merchantRepository.findAllByIsDeletedFalse().stream()
-                .map(m -> new ResMerchantDto(m.getMerchantId(), m.getKodeMerchant(), m.getNamaMerchant(), m.getStatus()))
+        return merchantRepository.findAll().stream()
+                .map(m -> new ResMerchantDto(m.getMerchantId(), m.getKodeMerchant(), m.getNamaMerchant(), m.getStatus(), m.getIsDeleted()))
                 .collect(Collectors.toList());
     }
 
@@ -100,9 +100,21 @@ public class MerchantServiceImpl implements MerchantService {
 
         if (request.getNamaMerchant() != null && !request.getNamaMerchant().isBlank()) {
             merchant.setNamaMerchant(request.getNamaMerchant());
-            merchantRepository.save(merchant);
         }
 
+        if ("ADMIN".equals(role)) {
+            if (request.getStatus() != null) {
+                merchant.setStatus(request.getStatus());
+            }
+            merchantRepository.save(merchant);
+            ResInternalAccountDto account = authFeignClient
+                    .getAccountById(UUID.fromString(merchant.getAccountId()))
+                    .getData();
+            log.info("Merchant updated by admin: merchantId={}", merchantId);
+            return new ResDetailMerchantDto(merchant.getMerchantId(), merchant.getKodeMerchant(), merchant.getNamaMerchant(), account.getEmail());
+        }
+
+        merchantRepository.save(merchant);
         ReqUpdateAccountDto accountDto = new ReqUpdateAccountDto(request.getEmail(), request.getPassword());
         ResInternalAccountDto updatedAccount = authFeignClient
                 .updateAccount(UUID.fromString(merchant.getAccountId()), accountDto)

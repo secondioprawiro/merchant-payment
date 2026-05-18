@@ -15,4 +15,5 @@ public class ResMerchantDto {
     private String kodeMerchant;
     private String namaMerchant;
     private MerchantEntity.Status status;
+    private Boolean isDeleted;
 }
