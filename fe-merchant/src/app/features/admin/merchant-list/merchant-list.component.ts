@@ -61,6 +61,12 @@ export class MerchantListComponent implements OnInit, OnDestroy {
     document.body.style.overflow = '';
   }
 
+  refreshStats() {
+    this.merchantService.getAdminStats().subscribe({
+      next: (s) => { this.stats = s; },
+    });
+  }
+
   loadMerchants() {
     this.loading = true;
     this.error = '';
@@ -72,7 +78,7 @@ export class MerchantListComponent implements OnInit, OnDestroy {
 
   openEdit(merchant: MerchantListItem) {
     this.editTarget = merchant;
-    this.editForm = { namaMerchant: merchant.namaMerchant };
+    this.editForm = { namaMerchant: merchant.namaMerchant, status: merchant.status as 'ACTIVE' | 'INACTIVE' };
     this.editError = '';
     this.lockScroll();
   }
@@ -88,18 +94,19 @@ export class MerchantListComponent implements OnInit, OnDestroy {
     if (!this.editTarget) return;
     const payload: UpdateProfileRequest = {};
     if (this.editForm.namaMerchant?.trim()) payload.namaMerchant = this.editForm.namaMerchant.trim();
-    if (this.editForm.email?.trim()) payload.email = this.editForm.email.trim();
-    if (this.editForm.password?.trim()) payload.password = this.editForm.password.trim();
+    if (this.editForm.status) payload.status = this.editForm.status;
 
     this.editLoading = true;
     this.editError = '';
     this.merchantService.updateProfile(this.editTarget.merchantId, payload).subscribe({
       next: () => {
-        if (this.editTarget && payload.namaMerchant) {
-          this.editTarget.namaMerchant = payload.namaMerchant;
+        if (this.editTarget) {
+          if (payload.namaMerchant) this.editTarget.namaMerchant = payload.namaMerchant;
+          if (payload.status) this.editTarget.status = payload.status;
         }
         this.editLoading = false;
         this.closeEdit();
+        this.refreshStats();
       },
       error: () => { this.editError = 'Gagal menyimpan perubahan.'; this.editLoading = false; },
     });

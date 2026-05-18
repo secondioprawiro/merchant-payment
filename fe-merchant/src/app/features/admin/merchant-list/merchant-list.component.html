@@ -117,13 +117,11 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="edit-email">Email (opsional)</label>
-          <input id="edit-email" class="field-input" type="email" [(ngModel)]="editForm.email" placeholder="Kosongkan jika tidak diubah" />
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="edit-pw">Password baru (opsional)</label>
-          <input id="edit-pw" class="field-input" type="password" [(ngModel)]="editForm.password" placeholder="Kosongkan jika tidak diubah" />
+          <label class="field-label" for="edit-status">Status</label>
+          <select id="edit-status" class="field-input" [(ngModel)]="editForm.status">
+            <option value="ACTIVE">Aktif</option>
+            <option value="INACTIVE">Nonaktif</option>
+          </select>
         </div>
 
         @if (editError) {

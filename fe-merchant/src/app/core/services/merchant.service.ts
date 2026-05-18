@@ -63,6 +63,7 @@ export interface MerchantListItem {
 
 export interface UpdateProfileRequest {
   namaMerchant?: string;
+  status?: 'ACTIVE' | 'INACTIVE';
   email?: string;
   password?: string;
 }
