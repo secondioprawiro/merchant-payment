@@ -22,4 +22,5 @@ public interface MerchantTransactionRepository extends JpaRepository<MerchantTra
     long countByMerchantIdAndStatus(UUID merchantId, MerchantTransactionEntity.Status status);
     long countByMerchantIdAndTransactionDateBetween(UUID merchantId, LocalDateTime start, LocalDateTime end);
     long countByMerchantIdAndStatusAndTransactionDateBetween(UUID merchantId, MerchantTransactionEntity.Status status, LocalDateTime start, LocalDateTime end);
+    Optional<MerchantTransactionEntity> findByIdempotencyKey(String idempotencyKey);
 }

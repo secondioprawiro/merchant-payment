@@ -21,7 +21,8 @@ public class MerchantTransactionEntity {
 
     public enum Status {
         SUCCESS,
-        FAILED
+        FAILED,
+        PENDING
     }
 
     @Id
@@ -29,16 +30,19 @@ public class MerchantTransactionEntity {
     @Column(name = "transaction_id")
     private UUID transactionId;
 
+    @Column(unique = true)
+    private String idempotencyKey;
+
     @Column(name = "merchant_id", nullable = false)
     private UUID merchantId;
 
-    @Column(name = "ref_id", nullable = false)
+    @Column(name = "ref_id")
     private String refId;
 
     @Column(name = "product_id", nullable = false)
     private String productId;
 
-    @Column(name = "product_name", nullable = false)
+    @Column(name = "product_name")
     private String productName;
 
     @Column(name = "nomor_tujuan", nullable = false)

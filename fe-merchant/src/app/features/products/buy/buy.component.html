@@ -65,9 +65,9 @@
 
       <button
         class="btn-primary"
-        [disabled]="!selectedProduct || !nomorTujuan"
+        [disabled]="!selectedProduct || !nomorTujuan || isLoading"
         (click)="prosesTransaksi()">
-        Proses transaksi
+        @if (isLoading) { Memproses... } @else { Proses Transaksi }
       </button>
       <p class="hint">Transaksi diproses secara otomatis</p>
     </div>

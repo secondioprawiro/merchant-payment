@@ -14,4 +14,7 @@ public class ReqTransactionDto {
 
     @NotBlank(message = "Nomor Tujuan Tidak Boleh Kosong")
     private String nomorTujuan;
+
+    @NotBlank
+    private String idempotencyKey;
 }

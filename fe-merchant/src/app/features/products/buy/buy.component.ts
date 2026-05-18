@@ -9,7 +9,7 @@ import {TransactionService} from '../../../core/services/transaction.service';
 import {TransactionDetailComponent } from '../../modal/transaction-detail/transaction-detail.component';
 import { MatDialog } from '@angular/material/dialog';
 import {WarningDialogComponent } from '../../modal/warning-dialog/warning-dialog.component';
-
+import { v4 as uuidv4 } from 'uuid';
 
 interface Product {
   productId: string;
@@ -81,9 +81,11 @@ export class BuyComponent implements OnInit {
   prosesTransaksi(): void {
     if (!this.selectedProduct || !this.nomorTujuan) return;
     this.isLoading = true;
+
     this.transactionService.buyProduct(
       this.selectedProduct.productId,
-      this.nomorTujuan
+      this.nomorTujuan,
+      uuidv4()
     ).subscribe({
       next: (res) => {
         console.log('Response transaksi:', res);
