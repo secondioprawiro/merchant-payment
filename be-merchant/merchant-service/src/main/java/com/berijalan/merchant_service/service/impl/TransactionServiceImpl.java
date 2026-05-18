@@ -11,6 +11,7 @@ import com.berijalan.merchant_service.exception.DataNotFoundException;
 import com.berijalan.merchant_service.exception.ForbiddenException;
 import com.berijalan.merchant_service.repository.MerchantRepository;
 import com.berijalan.merchant_service.repository.MerchantTransactionRepository;
+import com.berijalan.merchant_service.service.TransactionProcessorService;
 import com.berijalan.merchant_service.service.TransactionService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final MerchantTransactionRepository transactionRepository;
     private final ProductFeignClient productClient;
     private final ProductService productService;
+    private final TransactionProcessorService transactionProcessor;
 
 
     @Override
@@ -81,23 +83,36 @@ public class TransactionServiceImpl implements TransactionService {
                 throw new BadRequestException("Nomor meter PLN tidak valid");
             }
         }
-        ResTransactionDto productResponse = productClient.processTransaction(request).getData();
 
         MerchantTransactionEntity transaction = new MerchantTransactionEntity();
         transaction.setMerchantId(merchant.getMerchantId());
         transaction.setProductId(request.getProductId());
         transaction.setNamaMerchant(merchant.getNamaMerchant());
-        transaction.setProductName(productResponse.getProductName());
         transaction.setNomorTujuan(request.getNomorTujuan());
-        transaction.setRefId(productResponse.getRefId());
-        transaction.setStatus(MerchantTransactionEntity.Status.valueOf(productResponse.getStatus().toUpperCase()));
-        transaction.setAmount(productResponse.getPrice());
-        transaction.setFailureReason(productResponse.getFailureReason());
+        transaction.setAmount(productData.getData().getPrice());
+        transaction.setStatus(MerchantTransactionEntity.Status.PENDING); // ← PENDING
         transaction.setTransactionDate(LocalDateTime.now());
-
         MerchantTransactionEntity saved = transactionRepository.save(transaction);
-        log.info("Transaction saved: transactionId={}, refId={}, status={}", saved.getTransactionId(), saved.getRefId(), saved.getStatus());
-        return saved;
+        log.info("Transaction created PENDING: id={}", saved.getTransactionId());
+
+        ResTransactionDto productResponse;
+        try {
+            productResponse = transactionProcessor.process(request); // ← pakai processor
+        } catch (Exception e) {
+            log.error("Transaction failed after retries: id={}", saved.getTransactionId());
+            saved.setStatus(MerchantTransactionEntity.Status.FAILED);
+            saved.setFailureReason("Gagal menghubungi provider");
+            return transactionRepository.save(saved);
+        }
+
+        saved.setRefId(productResponse.getRefId());
+        saved.setProductName(productResponse.getProductName());
+        saved.setStatus(MerchantTransactionEntity.Status.valueOf(productResponse.getStatus().toUpperCase()));
+        saved.setFailureReason(productResponse.getFailureReason());
+        MerchantTransactionEntity updated = transactionRepository.save(saved);
+
+        log.info("Transaction updated: transactionId={}, refId={}, status={}", updated.getTransactionId(), updated.getStatus());
+        return updated;
     }
 
     @Override

@@ -21,7 +21,8 @@ public class MerchantTransactionEntity {
 
     public enum Status {
         SUCCESS,
-        FAILED
+        FAILED,
+        PENDING
     }
 
     @Id
