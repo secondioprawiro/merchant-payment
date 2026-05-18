@@ -53,7 +53,7 @@
               <th>KODE MERCHANT</th>
               <th>NAMA MERCHANT</th>
               <th>STATUS</th>
-              @if (activeTab !== 'dihapus') { <th>AKSI</th> }
+              <th>AKSI</th>
             </tr>
           </thead>
           <tbody>
@@ -75,7 +75,7 @@
                     </span>
                   }
                 </td>
-                @if (activeTab !== 'dihapus') {
+                @if (!m.isDeleted) {
                   <td class="action-cell">
                     <button class="btn-action edit" (click)="openEdit(m)" title="Edit">
                       <span class="material-icons-round">edit</span>
@@ -84,6 +84,8 @@
                       <span class="material-icons-round">delete</span>
                     </button>
                   </td>
+                } @else {
+                  <td></td>
                 }
               </tr>
             }
