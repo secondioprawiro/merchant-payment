@@ -214,7 +214,7 @@ Authorization: Bearer <token>
 ---
 
 ### PUT /gateway/merchant/{merchantId}
-Update nama merchant dan/atau email & password akun.  
+Update merchant. Field yang diproses berbeda berdasarkan role.  
 **Auth:** Required | **Role:** ADMIN atau USER pemilik merchant
 
 **Headers:**
@@ -231,10 +231,16 @@ Authorization: Bearer <token>
 ```json
 {
   "namaMerchant": "Toko Baru",
+  "status": "ACTIVE",
   "email": "baru@example.com",
   "password": "newpassword123"
 }
 ```
+
+> **ADMIN:** Hanya `namaMerchant` dan `status` yang diproses. Field `email` dan `password` diabaikan.  
+> **USER (pemilik):** Hanya `namaMerchant`, `email`, dan `password` yang diproses. Field `status` diabaikan.
+
+**Nilai `status` yang valid:** `ACTIVE` | `INACTIVE`
 
 **Validasi (jika diisi):**
 | Field | Aturan |
