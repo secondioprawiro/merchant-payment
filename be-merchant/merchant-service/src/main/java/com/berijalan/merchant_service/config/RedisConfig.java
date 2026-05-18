@@ -29,7 +29,6 @@ public class RedisConfig {
                 .disableCachingNullValues();
 
         return RedisCacheManager.builder(factory)
-                .withCacheConfiguration("merchants", merchantConfig)
                 .withCacheConfiguration("merchant-by-id", merchantConfig)
                 .withCacheConfiguration("merchant-by-user", merchantConfig)
                 .withCacheConfiguration("products", productConfig)

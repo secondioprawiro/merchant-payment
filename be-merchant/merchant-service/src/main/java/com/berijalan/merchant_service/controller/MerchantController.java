@@ -1,23 +1,20 @@
 package com.berijalan.merchant_service.controller;
 
 import com.berijalan.merchant_service.dto.request.ReqInternalCreateMerchantDto;
-import com.berijalan.merchant_service.dto.request.ReqTransactionDto;
 import com.berijalan.merchant_service.dto.request.ReqUpdateMerchantDto;
 import com.berijalan.merchant_service.dto.response.BaseResponse;
 import com.berijalan.merchant_service.dto.response.ResDetailMerchantDto;
 import com.berijalan.merchant_service.dto.response.ResMerchantDto;
-import com.berijalan.merchant_service.entity.MerchantTransactionEntity;
 import com.berijalan.merchant_service.exception.ForbiddenException;
 import com.berijalan.merchant_service.service.MerchantService;
-import com.berijalan.merchant_service.service.ProductService;
-import com.berijalan.merchant_service.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -34,12 +31,17 @@ public class MerchantController {
     }
 
     @GetMapping
-    public ResponseEntity<BaseResponse<List<ResMerchantDto>>> getAllMerchants(
-            @RequestHeader("X-User-Role") String role) {
+    public ResponseEntity<BaseResponse<Page<ResMerchantDto>>> getAllMerchants(
+            @RequestHeader("X-User-Role") String role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Boolean isDeleted) {
         if (!"ADMIN".equals(role)) {
             throw new ForbiddenException("Access denied");
         }
-        List<ResMerchantDto> merchants = merchantService.getAllMerchants();
+        Page<ResMerchantDto> merchants = merchantService.getAllMerchants(
+                PageRequest.of(page, size, Sort.by("createdDate").descending()), status, isDeleted);
         return ResponseEntity.ok(BaseResponse.success("Success", merchants));
     }
 

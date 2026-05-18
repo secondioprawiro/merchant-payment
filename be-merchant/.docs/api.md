@@ -105,7 +105,7 @@ Login dan dapatkan JWT token.
 ## Merchant Service
 
 ### GET /gateway/merchant
-Ambil semua merchant yang aktif.  
+Ambil semua merchant (termasuk yang dihapus) dengan pagination. Diurutkan berdasarkan tanggal dibuat terbaru.  
 **Auth:** Required | **Role:** ADMIN
 
 **Headers:**
@@ -113,16 +113,38 @@ Ambil semua merchant yang aktif.
 Authorization: Bearer <token>
 ```
 
+**Query Parameters:**
+| Parameter | Tipe | Default | Keterangan |
+|-----------|------|---------|------------|
+| page | int | 0 | Halaman ke-n (0-based) |
+| size | int | 20 | Jumlah item per halaman |
+| status | String | - | Filter status: `ACTIVE` atau `INACTIVE` |
+| isDeleted | boolean | - | Filter merchant yang dihapus: `true` atau `false` |
+
+**Contoh:**
+- `GET /gateway/merchant?page=0&size=20` — semua merchant
+- `GET /gateway/merchant?status=ACTIVE&isDeleted=false` — merchant aktif saja
+- `GET /gateway/merchant?isDeleted=true` — merchant yang sudah dihapus
+
 **Response 200 OK:**
 ```json
 {
   "message": "Success",
-  "data": [
-    {
-      "kodeMerchant": "MCH-A1B2C3D4",
-      "namaMerchant": "Toko Saya"
-    }
-  ]
+  "data": {
+    "content": [
+      {
+        "merchantId": "550e8400-e29b-41d4-a716-446655440000",
+        "kodeMerchant": "MCH-A1B2C3D4",
+        "namaMerchant": "Toko Saya",
+        "status": "ACTIVE",
+        "isDeleted": false
+      }
+    ],
+    "totalElements": 10,
+    "totalPages": 1,
+    "size": 20,
+    "number": 0
+  }
 }
 ```
 

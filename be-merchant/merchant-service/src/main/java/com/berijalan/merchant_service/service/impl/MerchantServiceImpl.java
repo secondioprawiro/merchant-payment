@@ -19,10 +19,12 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,7 +35,6 @@ public class MerchantServiceImpl implements MerchantService {
     private final AuthFeignClient authFeignClient;
 
     @Override
-    @CacheEvict(value = "merchants", key = "'all'")
     public void createMerchant(ReqInternalCreateMerchantDto request) {
         String kodeMerchant = generateKodeMerchant();
 
@@ -49,11 +50,25 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    @Cacheable(value = "merchants", key = "'all'")
-    public List<ResMerchantDto> getAllMerchants() {
-        return merchantRepository.findAll().stream()
-                .map(m -> new ResMerchantDto(m.getMerchantId(), m.getKodeMerchant(), m.getNamaMerchant(), m.getStatus(), m.getIsDeleted()))
-                .collect(Collectors.toList());
+    public Page<ResMerchantDto> getAllMerchants(Pageable pageable, String status, Boolean isDeleted) {
+        Specification<MerchantEntity> spec = Specification.unrestricted();
+
+        if (status != null) {
+            MerchantEntity.Status statusEnum;
+            try {
+                statusEnum = MerchantEntity.Status.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new com.berijalan.merchant_service.exception.BadRequestException("Status tidak valid. Gunakan: ACTIVE atau INACTIVE");
+            }
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), statusEnum));
+        }
+
+        if (isDeleted != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("isDeleted"), isDeleted));
+        }
+
+        return merchantRepository.findAll(spec, pageable)
+                .map(m -> new ResMerchantDto(m.getMerchantId(), m.getKodeMerchant(), m.getNamaMerchant(), m.getStatus(), m.getIsDeleted()));
     }
 
     @Override
@@ -85,7 +100,6 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "merchants", key = "'all'"),
             @CacheEvict(value = "merchant-by-id", key = "#merchantId"),
             @CacheEvict(value = "merchant-by-user", allEntries = true)
     })
@@ -126,7 +140,6 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "merchants", key = "'all'"),
             @CacheEvict(value = "merchant-by-id", key = "#merchantId"),
             @CacheEvict(value = "merchant-by-user", allEntries = true)
     })
