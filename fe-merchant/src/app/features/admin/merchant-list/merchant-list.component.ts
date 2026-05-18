@@ -19,6 +19,17 @@ export class MerchantListComponent implements OnInit, OnDestroy {
   loading = true;
   error = '';
 
+  activeTab: 'semua' | 'aktif' | 'nonaktif' | 'dihapus' = 'semua';
+
+  get filteredMerchants(): MerchantListItem[] {
+    switch (this.activeTab) {
+      case 'aktif':    return this.merchants.filter(m => !m.isDeleted && m.status === 'ACTIVE');
+      case 'nonaktif': return this.merchants.filter(m => !m.isDeleted && m.status !== 'ACTIVE');
+      case 'dihapus':  return this.merchants.filter(m => m.isDeleted);
+      default:         return this.merchants;
+    }
+  }
+
   get aktifRate(): number {
     if (!this.stats || this.stats.totalMerchant === 0) return 0;
     return Math.round((this.stats.totalMerchantAktif / this.stats.totalMerchant) * 100);

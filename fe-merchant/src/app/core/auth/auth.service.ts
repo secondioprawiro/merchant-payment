@@ -53,19 +53,36 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
+  private decodePayload(token: string): Record<string, any> | null {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch {
+      return null;
+    }
+  }
+
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+    const payload = this.decodePayload(token);
+    if (!payload || !payload['exp']) return true;
+    return payload['exp'] * 1000 < Date.now();
+  }
+
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    if (!this.getToken()) return false;
+    if (this.isTokenExpired()) {
+      this.logout();
+      return false;
+    }
+    return true;
   }
 
   getRole(): string | null {
     const token = this.getToken();
     if (!token) return null;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload['role'] ?? null;
-    } catch {
-      return null;
-    }
+    const payload = this.decodePayload(token);
+    return payload?.['role'] ?? null;
   }
 
   isAdmin(): boolean {

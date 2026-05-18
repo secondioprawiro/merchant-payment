@@ -82,16 +82,47 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinning { animation: spin 1s linear infinite; }
 
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 16px 24px 0;
+  border-bottom: 1px solid #f0f0f8;
+  margin-bottom: 4px;
+}
+
+.tab {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #9a9a9a;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+}
+
+.tab:hover { color: #4a4a6a; }
+
+.tab.active {
+  color: #6c63ff;
+  border-bottom-color: #6c63ff;
+}
+
 /* Table card */
 .table-card {
   background: #fff;
   border-radius: 16px;
-  padding: 24px;
+  padding: 0;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
 .table-wrap {
   overflow-x: auto;
+  padding: 16px 24px 24px;
 }
 
 .merchant-table {
@@ -156,6 +187,16 @@
 .status-badge.inactive {
   background: #f0f0f8;
   color: #9a9a9a;
+}
+
+.status-badge.deleted {
+  background: #fdf2f2;
+  color: #e74c3c;
+}
+
+.nama.deleted {
+  color: #9a9a9a;
+  text-decoration: line-through;
 }
 
 /* Action buttons */
