@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -43,6 +44,16 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public MerchantTransactionEntity buyProduct(String userId, ReqTransactionDto request) {
+        if (request.getIdempotencyKey() != null) {
+            Optional<MerchantTransactionEntity> existing =
+                    transactionRepository.findByIdempotencyKey(request.getIdempotencyKey());
+            if (existing.isPresent()) {
+                log.info("Duplicate request detected, returning existing transaction: id={}",
+                        existing.get().getTransactionId());
+                return existing.get();
+            }
+        }
+
         // 1. Validasi merchant
         MerchantEntity merchant = merchantRepository.findByAccountId(userId)
                 .orElseThrow(() -> {
@@ -85,19 +96,20 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         MerchantTransactionEntity transaction = new MerchantTransactionEntity();
+        transaction.setIdempotencyKey(request.getIdempotencyKey());
         transaction.setMerchantId(merchant.getMerchantId());
         transaction.setProductId(request.getProductId());
         transaction.setNamaMerchant(merchant.getNamaMerchant());
         transaction.setNomorTujuan(request.getNomorTujuan());
         transaction.setAmount(productData.getData().getPrice());
-        transaction.setStatus(MerchantTransactionEntity.Status.PENDING); // ← PENDING
+        transaction.setStatus(MerchantTransactionEntity.Status.PENDING);
         transaction.setTransactionDate(LocalDateTime.now());
         MerchantTransactionEntity saved = transactionRepository.save(transaction);
         log.info("Transaction created PENDING: id={}", saved.getTransactionId());
 
         ResTransactionDto productResponse;
         try {
-            productResponse = transactionProcessor.process(request); // ← pakai processor
+            productResponse = transactionProcessor.process(request);
         } catch (Exception e) {
             log.error("Transaction failed after retries: id={}", saved.getTransactionId());
             saved.setStatus(MerchantTransactionEntity.Status.FAILED);
@@ -111,7 +123,7 @@ public class TransactionServiceImpl implements TransactionService {
         saved.setFailureReason(productResponse.getFailureReason());
         MerchantTransactionEntity updated = transactionRepository.save(saved);
 
-        log.info("Transaction updated: transactionId={}, refId={}, status={}", updated.getTransactionId(), updated.getStatus());
+        log.info("Transaction updated: transactionId={}, status={}", updated.getTransactionId(), updated.getStatus());
         return updated;
     }
 
