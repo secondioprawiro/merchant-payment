@@ -99,6 +99,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setIdempotencyKey(request.getIdempotencyKey());
         transaction.setMerchantId(merchant.getMerchantId());
         transaction.setProductId(request.getProductId());
+        transaction.setProductName(productData.getData().getProductName());
         transaction.setNamaMerchant(merchant.getNamaMerchant());
         transaction.setNomorTujuan(request.getNomorTujuan());
         transaction.setAmount(productData.getData().getPrice());
@@ -118,7 +119,6 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         saved.setRefId(productResponse.getRefId());
-        saved.setProductName(productResponse.getProductName());
         saved.setStatus(MerchantTransactionEntity.Status.valueOf(productResponse.getStatus().toUpperCase()));
         saved.setFailureReason(productResponse.getFailureReason());
         MerchantTransactionEntity updated = transactionRepository.save(saved);
