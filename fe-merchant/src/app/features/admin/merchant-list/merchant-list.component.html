@@ -98,7 +98,7 @@
         </table>
       </div>
 
-      @if (totalPages > 1) {
+      @if (totalElements > pageSize) {
         <div class="pagination">
           <button class="page-btn" (click)="goToPage(page - 1)" [disabled]="page === 0">
             <span class="material-icons-round">chevron_left</span>

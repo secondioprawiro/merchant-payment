@@ -76,7 +76,8 @@ export class MerchantListComponent implements OnInit, OnDestroy {
       error: () => { this.loadingStats = false; },
     });
     this.merchantService.getAllMerchants(0, 1, undefined, true).subscribe({
-      next: (res) => { this.deletedCount = res.totalElements; },
+      next: (res) => { this.deletedCount = res.totalElements ?? 0; },
+      error: () => { this.deletedCount = 0; },
     });
     this.loadMerchants();
   }
@@ -98,9 +99,9 @@ export class MerchantListComponent implements OnInit, OnDestroy {
     this.merchantService.getAllMerchants(this.page, this.pageSize, status, isDeleted).subscribe({
       next: (res) => {
         this.merchants = res.content;
-        this.totalPages = res.totalPages;
-        this.totalElements = res.totalElements;
-        if (this.activeTab === 'dihapus') this.deletedCount = res.totalElements;
+        this.totalPages = res.totalPages ?? 0;
+        this.totalElements = res.totalElements ?? 0;
+        if (this.activeTab === 'dihapus') this.deletedCount = this.totalElements;
         this.loading = false;
       },
       error: () => { this.error = 'Gagal memuat daftar merchant.'; this.loading = false; },

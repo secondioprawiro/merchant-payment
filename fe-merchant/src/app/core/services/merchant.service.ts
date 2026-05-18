@@ -39,6 +39,7 @@ export interface PageResponse<T> {
   size: number;
   first: boolean;
   last: boolean;
+  page?: { totalElements: number; totalPages: number; number: number; size: number };
 }
 
 export interface AdminStats {
@@ -73,6 +74,16 @@ interface ApiResponse<T> {
   data: T;
 }
 
+function normalizePage<T>(p: PageResponse<T>): PageResponse<T> {
+  if (p.page) {
+    p.totalElements = p.page.totalElements;
+    p.totalPages    = p.page.totalPages;
+    p.number        = p.page.number;
+    p.size          = p.page.size;
+  }
+  return p;
+}
+
 @Injectable({ providedIn: 'root' })
 export class MerchantService {
   private http = inject(HttpClient);
@@ -89,7 +100,7 @@ export class MerchantService {
     if (startDate && endDate) url += `&startDate=${startDate}&endDate=${endDate}`;
     return this.http
       .get<ApiResponse<PageResponse<Transaction>>>(url)
-      .pipe(map(res => res.data));
+      .pipe(map(res => normalizePage(res.data)));
   }
 
   getMerchantStats(): Observable<MerchantStats> {
@@ -110,7 +121,7 @@ export class MerchantService {
     if (isDeleted !== undefined) url += `&isDeleted=${isDeleted}`;
     return this.http
       .get<ApiResponse<PageResponse<MerchantListItem>>>(url)
-      .pipe(map(res => res.data));
+      .pipe(map(res => normalizePage(res.data)));
   }
 
   updateProfile(merchantId: string, req: UpdateProfileRequest): Observable<MerchantProfile> {
