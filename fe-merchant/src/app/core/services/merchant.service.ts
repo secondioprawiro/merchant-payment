@@ -104,9 +104,12 @@ export class MerchantService {
       .pipe(map(res => res.data));
   }
 
-  getAllMerchants(): Observable<MerchantListItem[]> {
+  getAllMerchants(page = 0, size = 20, status?: string, isDeleted?: boolean): Observable<PageResponse<MerchantListItem>> {
+    let url = `${this.BASE}?page=${page}&size=${size}`;
+    if (status !== undefined) url += `&status=${status}`;
+    if (isDeleted !== undefined) url += `&isDeleted=${isDeleted}`;
     return this.http
-      .get<ApiResponse<MerchantListItem[]>>(this.BASE)
+      .get<ApiResponse<PageResponse<MerchantListItem>>>(url)
       .pipe(map(res => res.data));
   }
 

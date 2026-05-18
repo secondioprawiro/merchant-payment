@@ -19,15 +19,15 @@ export class MerchantListComponent implements OnInit, OnDestroy {
   loading = true;
   error = '';
 
+  page = 0;
+  pageSize = 5;
+  totalPages = 0;
+  totalElements = 0;
+
   activeTab: 'semua' | 'aktif' | 'nonaktif' | 'dihapus' = 'semua';
 
   get filteredMerchants(): MerchantListItem[] {
-    switch (this.activeTab) {
-      case 'aktif':    return this.merchants.filter(m => !m.isDeleted && m.status === 'ACTIVE');
-      case 'nonaktif': return this.merchants.filter(m => !m.isDeleted && m.status !== 'ACTIVE');
-      case 'dihapus':  return this.merchants.filter(m => m.isDeleted);
-      default:         return this.merchants;
-    }
+    return this.merchants;
   }
 
   get aktifRate(): number {
@@ -35,8 +35,25 @@ export class MerchantListComponent implements OnInit, OnDestroy {
     return Math.round((this.stats.totalMerchantAktif / this.stats.totalMerchant) * 100);
   }
 
+  deletedCount = 0;
+
   get totalDihapus(): number {
-    return this.merchants.filter(m => m.isDeleted).length;
+    return this.deletedCount;
+  }
+
+  private getFilterParams(): { status?: string; isDeleted?: boolean } {
+    switch (this.activeTab) {
+      case 'aktif':    return { status: 'ACTIVE', isDeleted: false };
+      case 'nonaktif': return { status: 'INACTIVE', isDeleted: false };
+      case 'dihapus':  return { isDeleted: true };
+      default:         return {};
+    }
+  }
+
+  setTab(tab: 'semua' | 'aktif' | 'nonaktif' | 'dihapus') {
+    this.activeTab = tab;
+    this.page = 0;
+    this.loadMerchants();
   }
 
   // Edit modal
@@ -58,6 +75,9 @@ export class MerchantListComponent implements OnInit, OnDestroy {
       next: (s) => { this.stats = s; this.loadingStats = false; },
       error: () => { this.loadingStats = false; },
     });
+    this.merchantService.getAllMerchants(0, 1, undefined, true).subscribe({
+      next: (res) => { this.deletedCount = res.totalElements; },
+    });
     this.loadMerchants();
   }
 
@@ -74,10 +94,23 @@ export class MerchantListComponent implements OnInit, OnDestroy {
   loadMerchants() {
     this.loading = true;
     this.error = '';
-    this.merchantService.getAllMerchants().subscribe({
-      next: (list) => { this.merchants = list; this.loading = false; },
+    const { status, isDeleted } = this.getFilterParams();
+    this.merchantService.getAllMerchants(this.page, this.pageSize, status, isDeleted).subscribe({
+      next: (res) => {
+        this.merchants = res.content;
+        this.totalPages = res.totalPages;
+        this.totalElements = res.totalElements;
+        if (this.activeTab === 'dihapus') this.deletedCount = res.totalElements;
+        this.loading = false;
+      },
       error: () => { this.error = 'Gagal memuat daftar merchant.'; this.loading = false; },
     });
+  }
+
+  goToPage(p: number) {
+    if (p < 0 || p >= this.totalPages) return;
+    this.page = p;
+    this.loadMerchants();
   }
 
   openEdit(merchant: MerchantListItem) {
@@ -131,9 +164,11 @@ export class MerchantListComponent implements OnInit, OnDestroy {
     this.deleteLoading = true;
     this.merchantService.deleteMerchant(this.deleteTarget.merchantId).subscribe({
       next: () => {
-        this.merchants = this.merchants.filter(m => m.merchantId !== this.deleteTarget!.merchantId);
+        this.deletedCount++;
         this.deleteLoading = false;
         this.closeDelete();
+        this.loadMerchants();
+        this.refreshStats();
       },
       error: () => { this.deleteLoading = false; },
     });
