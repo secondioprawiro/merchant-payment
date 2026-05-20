@@ -38,7 +38,7 @@ public class TransactionProcessorService {
         if (response.getStatus().equals("FAILED") &&
                 RETRYABLE_REASONS.contains(response.getFailureReason())) {
             log.warn("Retryable failure: {}", response.getFailureReason());
-            throw new RetryableTransactionException(response.getFailureReason());
+            throw new RetryableTransactionException(response.getFailureReason(), response);
         }
 
         return response;
@@ -50,7 +50,9 @@ public class TransactionProcessorService {
                 request.getProductId(), e.getMessage());
 
         ResTransactionDto failed = new ResTransactionDto();
+        ResTransactionDto lastResponse = e.getLastResponse();
         failed.setStatus("FAILED");
+        failed.setRefId(lastResponse.getRefId());
         failed.setFailureReason(e.getMessage());
         return failed;
     }

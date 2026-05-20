@@ -37,7 +37,6 @@ import java.util.stream.StreamSupport;
 public class TransactionServiceImpl implements TransactionService {
     private final MerchantRepository merchantRepository;
     private final MerchantTransactionRepository transactionRepository;
-    private final ProductFeignClient productClient;
     private final ProductService productService;
     private final TransactionProcessorService transactionProcessor;
 
@@ -121,6 +120,7 @@ public class TransactionServiceImpl implements TransactionService {
         saved.setRefId(productResponse.getRefId());
         saved.setStatus(MerchantTransactionEntity.Status.valueOf(productResponse.getStatus().toUpperCase()));
         saved.setFailureReason(productResponse.getFailureReason());
+
         MerchantTransactionEntity updated = transactionRepository.save(saved);
 
         log.info("Transaction updated: transactionId={}, status={}", updated.getTransactionId(), updated.getStatus());
