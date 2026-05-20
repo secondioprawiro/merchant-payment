@@ -36,6 +36,7 @@ export class BuyComponent implements OnInit {
   showModal: boolean = false;
   transactionDetail: any = null;
   isLoading: boolean = false;
+  idempotencyKey : string = '';
 
   get filteredProducts(): Product[] {
     return this.products.filter(p => p.type === this.selectedType);
@@ -50,6 +51,7 @@ export class BuyComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.idempotencyKey = uuidv4();
     this.productService.getProducts().subscribe(data => {
       this.products = data;
       this.selectedProduct = this.filteredProducts[0] ?? null;
@@ -85,13 +87,14 @@ export class BuyComponent implements OnInit {
     this.transactionService.buyProduct(
       this.selectedProduct.productId,
       this.nomorTujuan,
-      uuidv4()
+      this.idempotencyKey
     ).subscribe({
       next: (res) => {
         console.log('Response transaksi:', res);
         this.isLoading = false;
         this.transactionDetail= res.data;
         this.showModal = true;
+        this.idempotencyKey = uuidv4();
       },
       error: (err) => {
         const status = err.status;

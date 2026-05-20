@@ -8,12 +8,6 @@ interface ApiResponse<T> {
   data: T;
 }
 
-export interface BuyProductRequest {
-  productId: string;
-  nomorTujuan: string;
-  idempotencyKey: string;
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -21,7 +15,7 @@ export class TransactionService {
   private http = inject(HttpClient);
   private readonly BASE = '/gateway/transaction';
 
-  buyProduct(productId: string, nomorTujuan: string, idempotencyKey: string){
+  buyProduct(productId: string, nomorTujuan: string, idempotencyKey: string):Observable<any>{
     return this.http.post<ApiResponse<any>>(`${this.BASE}`, {
       productId,
       nomorTujuan,
